@@ -1,0 +1,65 @@
+import { describe, expect, it } from "vitest";
+import {
+  asciiPatternDataUri,
+  backgroundClasses,
+  buttonClasses,
+  normalizeButtonStyle,
+  normalizePageBackgroundStyle,
+  platformButtonInk,
+  platformBrandStyle,
+  platformIconTint
+} from "../src/lib/page-style";
+
+describe("normalizePageBackgroundStyle", () => {
+  it("returns blur for unknown values", () => {
+    expect(normalizePageBackgroundStyle("invalid")).toBe("blur");
+    expect(normalizePageBackgroundStyle(null)).toBe("blur");
+  });
+
+  it("accepts valid background styles", () => {
+    expect(normalizePageBackgroundStyle("mesh")).toBe("mesh");
+    expect(normalizePageBackgroundStyle("aurora")).toBe("aurora");
+  });
+});
+
+describe("normalizeButtonStyle", () => {
+  it("returns monochrome for unknown values", () => {
+    expect(normalizeButtonStyle(undefined)).toBe("monochrome");
+  });
+
+  it("accepts valid button styles", () => {
+    expect(normalizeButtonStyle("full-color")).toBe("full-color");
+    expect(normalizeButtonStyle("gradient-logo")).toBe("gradient-logo");
+  });
+});
+
+describe("platform helpers", () => {
+  it("maps class names from style enums", () => {
+    expect(backgroundClasses("vinyl")).toBe("smart-page--bg-vinyl");
+    expect(buttonClasses("colored-border")).toBe("smart-page--btn-colored-border");
+  });
+
+  it("tints icons for logo-forward button styles", () => {
+    expect(platformIconTint("monochrome")).toBe(false);
+    expect(platformIconTint("logo-color")).toBe(true);
+    expect(platformIconTint("gradient-logo")).toBe(true);
+    expect(platformIconTint("full-color")).toBe(true);
+  });
+
+  it("picks readable ink on brand fills", () => {
+    expect(platformButtonInk("#1ED760")).toMatch(/0\.15|0\.98/);
+    expect(platformBrandStyle("spotify")).toContain("--platform-brand: #1ED760");
+  });
+});
+
+describe("asciiPatternDataUri", () => {
+  it("returns an encoded SVG data URI", () => {
+    const uri = asciiPatternDataUri({
+      "--page-tint": "rgb(78 30 79)",
+      "--primary": "rgb(255 255 255)",
+      "--muted": "rgb(200 180 200)"
+    });
+    expect(uri.startsWith('url("data:image/svg+xml,')).toBe(true);
+    expect(decodeURIComponent(uri)).toContain("<text");
+  });
+});

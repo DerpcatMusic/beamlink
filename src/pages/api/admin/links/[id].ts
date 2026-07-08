@@ -25,7 +25,9 @@ export const PATCH: APIRoute = async (context) => {
       viewEventName: body.viewEventName,
       clickEventName: body.clickEventName,
       status: body.status,
-      releaseAt: body.releaseAt
+      releaseAt: body.releaseAt,
+      pageBackgroundStyle: body.pageBackgroundStyle,
+      buttonStyle: body.buttonStyle
     });
     return json({ link });
   } catch (error) {

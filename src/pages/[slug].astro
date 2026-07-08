@@ -11,6 +11,13 @@ import { artworkPublicPath } from "@lib/artwork";
 import { effectiveLinkMode, presaveDestinationLabel, resolveClickEventName, resolvePaidClickEventName } from "@lib/effective-mode";
 import { formatShortDate } from "@lib/datetime";
 import { parseTrackPalette, paletteStyleAttribute } from "@lib/palette";
+import {
+  asciiPatternDataUri,
+  backgroundClasses,
+  buttonClasses,
+  platformBrandStyle,
+  platformIconTint
+} from "@lib/page-style";
 import { spotifyAppUri, spotifyDestinationUrl } from "@lib/spotify-links";
 
 const env = getRuntimeEnv(Astro);
@@ -93,7 +100,11 @@ const baseUrl = publicBaseUrl(env, Astro.request).replace(/\/$/, "");
 const artworkPath = artworkPublicPath(link.track);
 const artwork = artworkPath.startsWith("http") ? artworkPath : `${baseUrl}${artworkPath}`;
 const paletteVars = parseTrackPalette(link.track.palette);
-const pageStyle = `${paletteStyleAttribute(paletteVars)}; --artwork-image: url("${artwork.replace(/["\\\n\r]/g, "")}")`;
+const pageBackgroundStyle = link.page_background_style;
+const buttonStyle = link.button_style;
+const iconTint = platformIconTint(buttonStyle);
+const asciiPattern = pageBackgroundStyle === "ascii" ? asciiPatternDataUri(paletteVars) : "";
+const pageStyle = `${paletteStyleAttribute(paletteVars)}; --artwork-image: url("${artwork.replace(/["\\\n\r]/g, "")}")${asciiPattern ? `; --ascii-pattern: ${asciiPattern}` : ""}`;
 const releaseAt = link.track.release_at;
 const isPresave = effectiveMode === "presave";
 const pixelScript = trackTracking
@@ -179,8 +190,22 @@ const destinationRows = sortedDestinations.map((destination) => {
     </div>
   )}
 
-  <main class:list={["smart-page", embedded && "smart-page--embedded"]} style={pageStyle}>
-    <div class="artwork-bg" aria-hidden="true"></div>
+  <main
+    class:list={[
+      "smart-page",
+      backgroundClasses(pageBackgroundStyle),
+      buttonClasses(buttonStyle),
+      embedded && "smart-page--embedded"
+    ]}
+    style={pageStyle}
+  >
+    <div class="page-backdrop" aria-hidden="true">
+      <div class="artwork-bg"></div>
+      {pageBackgroundStyle === "ascii" && <div class="ascii-overlay"></div>}
+      {(pageBackgroundStyle === "mesh" || pageBackgroundStyle === "aurora" || pageBackgroundStyle === "vinyl") && (
+        <div class:list={["bg-effect", `bg-effect--${pageBackgroundStyle}`]}></div>
+      )}
+    </div>
     <div class="page-scrim" aria-hidden="true"></div>
 
     <section class="release">
@@ -235,6 +260,8 @@ const destinationRows = sortedDestinations.map((destination) => {
             row.destination.is_primary === 1 && "destination--primary"
           ]}
           href={row.href}
+          data-platform={row.destination.platform}
+          style={platformBrandStyle(row.destination.platform)}
           data-track-click
           data-event-id={row.eventId}
           data-event-name={row.eventName}
@@ -246,7 +273,7 @@ const destinationRows = sortedDestinations.map((destination) => {
           data-fallback-url={row.fallbackUrl}
           data-app-uri={row.appUri ?? ""}
         >
-          <PlatformIcon platform={row.destination.platform} size={22} />
+          <PlatformIcon platform={row.destination.platform} size={22} tint={iconTint} />
           <span>{row.cta}</span>
           <svg class="chevron" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l6 6-6 6" /></svg>
         </a>
@@ -434,25 +461,124 @@ const destinationRows = sortedDestinations.map((destination) => {
     padding-block: 1.25rem;
   }
 
-  .artwork-bg {
+  .page-backdrop {
     position: fixed;
     inset: -7rem;
     z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .smart-page--embedded .page-backdrop {
+    position: absolute;
+    inset: -4rem -3rem;
+  }
+
+  .artwork-bg {
+    position: absolute;
+    inset: 0;
     background:
       linear-gradient(180deg, oklch(0.1 0.01 260 / 0.16), var(--page-tint, var(--background)) 86%),
       var(--artwork-image);
     background-position: center;
     background-size: cover;
-    filter: blur(3.8rem) saturate(1.38) brightness(1.22);
+    opacity: 0;
     transform: scale(1.12);
-    opacity: 0.95;
   }
 
-  .smart-page--embedded .artwork-bg {
-    position: absolute;
-    inset: -4rem -3rem;
+  .smart-page--bg-blur .artwork-bg,
+  .smart-page--bg-ascii .artwork-bg {
+    opacity: 0.95;
+    filter: blur(3.8rem) saturate(1.38) brightness(1.22);
+  }
+
+  .smart-page--embedded.smart-page--bg-blur .artwork-bg,
+  .smart-page--embedded.smart-page--bg-ascii .artwork-bg {
     filter: blur(3rem) saturate(1.28) brightness(1.14);
     transform: scale(1);
+  }
+
+  .smart-page--bg-ascii .artwork-bg {
+    filter: blur(2.2rem) saturate(1.2) brightness(1.08) contrast(1.12);
+    image-rendering: pixelated;
+  }
+
+  .ascii-overlay {
+    position: absolute;
+    inset: 0;
+    background-image: var(--ascii-pattern);
+    background-size: 260px 200px;
+    mix-blend-mode: soft-light;
+    opacity: 0.72;
+  }
+
+  .bg-effect {
+    position: absolute;
+    inset: 0;
+  }
+
+  .bg-effect--mesh {
+    background:
+      radial-gradient(ellipse 90% 70% at 12% 18%, color-mix(in oklch, var(--page-tint) 88%, var(--primary) 12%) 0%, transparent 58%),
+      radial-gradient(ellipse 75% 60% at 88% 14%, color-mix(in oklch, var(--primary) 72%, var(--page-tint) 28%) 0%, transparent 52%),
+      radial-gradient(ellipse 80% 65% at 72% 88%, color-mix(in oklch, var(--page-tint) 65%, var(--surface) 35%) 0%, transparent 55%),
+      radial-gradient(ellipse 55% 45% at 42% 58%, color-mix(in oklch, var(--primary) 45%, transparent) 0%, transparent 62%),
+      var(--background);
+  }
+
+  .bg-effect--aurora::before,
+  .bg-effect--aurora::after {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    border-radius: 50%;
+    filter: blur(4.5rem);
+    opacity: 0.72;
+  }
+
+  .bg-effect--aurora::before {
+    background: radial-gradient(circle, color-mix(in oklch, var(--primary) 70%, transparent) 0%, transparent 68%);
+    transform: translate(-8%, -6%);
+  }
+
+  .bg-effect--aurora::after {
+    background: radial-gradient(circle, color-mix(in oklch, var(--page-tint) 75%, var(--primary) 25%) 0%, transparent 70%);
+    transform: translate(10%, 8%);
+  }
+
+  .bg-effect--aurora {
+    background: linear-gradient(165deg, var(--background), color-mix(in oklch, var(--page-tint) 55%, var(--background)));
+  }
+
+  .bg-effect--vinyl {
+    background:
+      repeating-radial-gradient(
+        circle at 50% 42%,
+        transparent 0 2px,
+        color-mix(in oklch, var(--foreground) 8%, transparent) 2px 3px
+      ),
+      radial-gradient(circle at 50% 42%, color-mix(in oklch, var(--page-tint) 70%, var(--primary) 30%) 0%, transparent 38%),
+      radial-gradient(circle at 50% 42%, color-mix(in oklch, var(--page-tint) 45%, var(--background)) 0%, var(--background) 72%);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .bg-effect--aurora::before {
+      animation: aurora-drift-a 22s ease-in-out infinite alternate;
+    }
+
+    .bg-effect--aurora::after {
+      animation: aurora-drift-b 28s ease-in-out infinite alternate;
+    }
+  }
+
+  @keyframes aurora-drift-a {
+    from { transform: translate(-12%, -8%) scale(1); }
+    to { transform: translate(6%, 4%) scale(1.08); }
+  }
+
+  @keyframes aurora-drift-b {
+    from { transform: translate(8%, 6%) scale(1.02); }
+    to { transform: translate(-6%, -4%) scale(0.96); }
   }
 
   .page-scrim {
@@ -685,6 +811,93 @@ const destinationRows = sortedDestinations.map((destination) => {
     outline-color: oklch(0.17 0.006 265);
   }
 
+  /* Button style variants — platform brand via --platform-brand / --platform-ink */
+  .smart-page--btn-logo-color .destination :global(.platform-icon) {
+    color: var(--platform-brand);
+  }
+
+  .smart-page--btn-colored-border .destination {
+    border-color: color-mix(in srgb, var(--platform-brand) 48%, oklch(0.98 0.004 265 / 0.14));
+  }
+
+  .smart-page--btn-gradient-lr .destination {
+    background: linear-gradient(
+      90deg,
+      oklch(0.22 0.006 265 / 0.55) 0%,
+      color-mix(in srgb, var(--platform-brand) 32%, oklch(0.22 0.006 265 / 0.55)) 100%
+    );
+  }
+
+  .smart-page--btn-gradient-logo .destination {
+    background: linear-gradient(
+      90deg,
+      oklch(0.22 0.006 265 / 0.55) 0%,
+      color-mix(in srgb, var(--platform-brand) 38%, oklch(0.22 0.006 265 / 0.55)) 100%
+    );
+  }
+
+  .smart-page--btn-gradient-logo .destination :global(.platform-icon) {
+    color: var(--platform-brand);
+  }
+
+  .smart-page--btn-full-color .destination {
+    background: var(--platform-brand);
+    border-color: color-mix(in srgb, var(--platform-brand) 80%, oklch(0 0 0));
+    color: var(--platform-ink);
+    backdrop-filter: none;
+  }
+
+  .smart-page--btn-full-color .destination .chevron {
+    color: color-mix(in srgb, var(--platform-ink) 55%, transparent);
+  }
+
+  .smart-page--btn-full-color .destination:hover {
+    background: color-mix(in srgb, var(--platform-brand) 92%, white);
+    border-color: color-mix(in srgb, var(--platform-brand) 80%, oklch(0 0 0));
+  }
+
+  .smart-page--btn-full-color .destination:hover .chevron {
+    color: var(--platform-ink);
+  }
+
+  .smart-page--btn-full-color .destination--primary,
+  .smart-page--btn-full-color .destination:first-child {
+    background: var(--platform-brand);
+    color: var(--platform-ink);
+    box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--platform-brand) 55%, oklch(0 0 0));
+  }
+
+  .smart-page--btn-monochrome .destination:first-child,
+  .smart-page--btn-logo-color .destination:first-child,
+  .smart-page--btn-colored-border .destination:first-child,
+  .smart-page--btn-gradient-lr .destination:first-child,
+  .smart-page--btn-gradient-logo .destination:first-child {
+    background: oklch(0.97 0.005 265);
+    border-color: transparent;
+    color: oklch(0.17 0.006 265);
+    box-shadow: 0 8px 24px -12px oklch(0 0 0 / 0.6);
+  }
+
+  .smart-page--btn-monochrome .destination:first-child .chevron,
+  .smart-page--btn-logo-color .destination:first-child .chevron,
+  .smart-page--btn-colored-border .destination:first-child .chevron,
+  .smart-page--btn-gradient-lr .destination:first-child .chevron,
+  .smart-page--btn-gradient-logo .destination:first-child .chevron {
+    color: oklch(0.17 0.006 265 / 0.55);
+  }
+
+  .smart-page--btn-monochrome .destination:first-child:hover,
+  .smart-page--btn-logo-color .destination:first-child:hover,
+  .smart-page--btn-colored-border .destination:first-child:hover,
+  .smart-page--btn-gradient-lr .destination:first-child:hover,
+  .smart-page--btn-gradient-logo .destination:first-child:hover {
+    background: oklch(1 0 0);
+  }
+
+  .smart-page--btn-logo-color .destination:first-child :global(.platform-icon) {
+    color: var(--platform-brand);
+  }
+
   .subscribe-row input:focus-visible {
     outline: 2px solid var(--foreground);
     outline-offset: 2px;
@@ -730,6 +943,11 @@ const destinationRows = sortedDestinations.map((destination) => {
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .bg-effect--aurora::before,
+    .bg-effect--aurora::after {
+      animation: none;
+    }
+
     .destination:hover,
     .subscribe-submit:hover {
       transform: none;

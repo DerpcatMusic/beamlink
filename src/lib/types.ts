@@ -1,6 +1,10 @@
+import type { ButtonStyle, PageBackgroundStyle } from "@lib/page-style";
+
 export type LinkMode = "presave" | "live";
 export type LinkStatus = "draft" | "published" | "archived";
 export type SpotifyOpenBehavior = "web" | "playlist_context" | "app_first";
+
+export type { ButtonStyle, PageBackgroundStyle };
 
 export type Platform =
   | "spotify"
@@ -66,6 +70,8 @@ export interface SmartLink {
   paid_click_event_name: string;
   spotify_open_behavior: SpotifyOpenBehavior;
   spotify_context_url: string | null;
+  page_background_style: PageBackgroundStyle;
+  button_style: ButtonStyle;
   created_at: string;
   updated_at: string;
   published_at: string | null;

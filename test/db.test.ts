@@ -34,6 +34,8 @@ function makeEnv() {
                 meta_event_name: "ViewContent",
                 view_event_name: "ViewContent",
                 click_event_name: null,
+                page_background_style: "blur",
+                button_style: "monochrome",
                 created_at: "2026-01-01T00:00:00Z",
                 updated_at: "2026-01-01T00:00:00Z",
                 published_at: null
@@ -111,7 +113,9 @@ describe("createLink", () => {
       "published",
       "web",
       null,
-      "Stream_Click_Paid"
+      "Stream_Click_Paid",
+      "blur",
+      "monochrome"
     ]);
   });
 
@@ -132,10 +136,12 @@ describe("createLink", () => {
     await createLink(env, input);
 
     const insert = calls.find((call) => call.sql.includes("INSERT INTO links"));
-    expect(insert?.bindings.slice(-3)).toEqual([
+    expect(insert?.bindings.slice(-5)).toEqual([
       "app_first",
       "spotify:playlist:abc123456789",
-      "Stream_Click_Paid_Meta"
+      "Stream_Click_Paid_Meta",
+      "blur",
+      "monochrome"
     ]);
   });
 

@@ -5,6 +5,7 @@ import Button from "@components/Button.astro";
 import Field from "@components/Field.astro";
 import Icon from "@components/Icon.astro";
 import PlatformIcon from "@components/PlatformIcon.astro";
+import PageStyleFields from "@components/PageStyleFields.astro";
 import { getLinkById } from "@lib/db";
 import { getRuntimeEnv, publicBaseUrl, requireAdmin } from "@lib/runtime";
 import { artworkPublicPath } from "@lib/artwork";
@@ -140,6 +141,11 @@ const identityBadges = [
         </div>
       </section>
 
+      <PageStyleFields
+        backgroundStyle={link.page_background_style}
+        buttonStyle={link.button_style}
+      />
+
       <section class="form-block">
         <div class="block-head">
           <h2 class="section-title">Spotify open behavior</h2>
@@ -260,6 +266,8 @@ const identityBadges = [
         paidClickEventName: value("#paidClickEventName") || "Stream_Click_Paid",
         spotifyOpenBehavior: value("#spotifyOpenBehavior") || "web",
         spotifyContextUrl: value("#spotifyContextUrl") || null,
+        pageBackgroundStyle: form.querySelector("input[name='pageBackgroundStyle']:checked")?.value || "blur",
+        buttonStyle: form.querySelector("input[name='buttonStyle']:checked")?.value || "monochrome",
         releaseAt: fromDatetimeLocal(value("#releaseAt")),
         destinations,
         ...extra

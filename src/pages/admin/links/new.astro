@@ -1,7 +1,9 @@
 ---
 import AppLayout from "@layouts/AppLayout.astro";
+import PageStyleFields from "@components/PageStyleFields.astro";
 import PlatformIcon from "@components/PlatformIcon.astro";
 import { getRuntimeEnv, requireAdmin } from "@lib/runtime";
+import { DEFAULT_BUTTON_STYLE, DEFAULT_PAGE_BACKGROUND_STYLE } from "@lib/page-style";
 import { platformLabels, type Platform } from "@lib/types";
 
 const env = getRuntimeEnv(Astro);
@@ -84,6 +86,11 @@ if (blocked) return blocked;
           </div>
         ))}
       </div>
+
+      <PageStyleFields
+        backgroundStyle={DEFAULT_PAGE_BACKGROUND_STYLE}
+        buttonStyle={DEFAULT_BUTTON_STYLE}
+      />
 
       <div class="actions">
         <button class="button accent" type="submit">Create link</button>
@@ -232,6 +239,8 @@ if (blocked) return blocked;
         linkName: value("#linkName"),
         slug: value("#slug"),
         mode: value("#mode"),
+        pageBackgroundStyle: form.querySelector("input[name='pageBackgroundStyle']:checked")?.value || "blur",
+        buttonStyle: form.querySelector("input[name='buttonStyle']:checked")?.value || "monochrome",
         destinations,
         releaseAt: fromDatetimeLocal(value("#releaseAt"))
       };

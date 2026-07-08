@@ -1,0 +1,243 @@
+---
+import {
+  BUTTON_STYLES,
+  PAGE_BACKGROUND_STYLES,
+  buttonStyleDescriptions,
+  buttonStyleLabels,
+  pageBackgroundDescriptions,
+  pageBackgroundLabels,
+  type ButtonStyle,
+  type PageBackgroundStyle
+} from "@lib/page-style";
+
+interface Props {
+  backgroundStyle: PageBackgroundStyle;
+  buttonStyle: ButtonStyle;
+}
+
+const { backgroundStyle, buttonStyle } = Astro.props;
+---
+
+<section class="form-block">
+  <div class="block-head">
+    <h2 class="section-title">Page appearance</h2>
+    <p class="block-copy">Background and platform button styles fans see on the public link.</p>
+  </div>
+  <div class="block-body appearance-body">
+    <fieldset class="style-fieldset">
+      <legend>Background</legend>
+      <div class="style-grid">
+        {PAGE_BACKGROUND_STYLES.map((style) => (
+          <label class:list={["style-card", "style-card--bg", `style-card--bg-${style}`, backgroundStyle === style && "is-selected"]}>
+            <input
+              type="radio"
+              name="pageBackgroundStyle"
+              value={style}
+              checked={backgroundStyle === style}
+            />
+            <span class="style-card__preview" aria-hidden="true"></span>
+            <span class="style-card__copy">
+              <span class="style-card__label">{pageBackgroundLabels[style]}</span>
+              <span class="style-card__hint">{pageBackgroundDescriptions[style]}</span>
+            </span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+
+    <fieldset class="style-fieldset">
+      <legend>Platform buttons</legend>
+      <div class="style-grid style-grid--buttons">
+        {BUTTON_STYLES.map((style) => (
+          <label class:list={["style-card", "style-card--btn", `style-card--btn-${style}`, buttonStyle === style && "is-selected"]}>
+            <input
+              type="radio"
+              name="buttonStyle"
+              value={style}
+              checked={buttonStyle === style}
+            />
+            <span class="style-card__preview style-card__preview--btn" aria-hidden="true">
+              <span class="btn-swatch btn-swatch--spotify"></span>
+              <span class="btn-swatch btn-swatch--apple"></span>
+            </span>
+            <span class="style-card__copy">
+              <span class="style-card__label">{buttonStyleLabels[style]}</span>
+              <span class="style-card__hint">{buttonStyleDescriptions[style]}</span>
+            </span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  </div>
+</section>
+
+<style>
+  .appearance-body {
+    display: grid;
+    gap: 1.35rem;
+  }
+
+  .style-fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .style-fieldset legend {
+    margin-bottom: 0.55rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .style-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.5rem), 1fr));
+    gap: 0.55rem;
+  }
+
+  .style-grid--buttons {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr));
+  }
+
+  .style-card {
+    position: relative;
+    display: grid;
+    gap: 0.55rem;
+    padding: 0.65rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    cursor: pointer;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  }
+
+  .style-card:hover {
+    border-color: color-mix(in oklch, var(--accent) 35%, var(--border-strong));
+  }
+
+  .style-card.is-selected {
+    border-color: var(--accent);
+    background: color-mix(in oklch, var(--accent) 8%, var(--surface));
+    box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent) 40%, transparent);
+  }
+
+  .style-card input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .style-card__preview {
+    display: block;
+    height: 3.25rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .style-card__preview--btn {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.45rem;
+    background: oklch(0.14 0.01 265);
+  }
+
+  .btn-swatch {
+    display: block;
+    height: 0.85rem;
+    border-radius: 999px;
+    background: oklch(0.28 0.006 265 / 0.8);
+  }
+
+  .btn-swatch--spotify {
+    background: oklch(0.28 0.006 265 / 0.8);
+  }
+
+  .btn-swatch--apple {
+    background: oklch(0.28 0.006 265 / 0.55);
+  }
+
+  .style-card--bg-blur .style-card__preview {
+    background:
+      radial-gradient(circle at 30% 20%, oklch(0.55 0.14 320 / 0.75), transparent 58%),
+      radial-gradient(circle at 72% 78%, oklch(0.42 0.1 250 / 0.65), transparent 55%),
+      oklch(0.18 0.02 280);
+    filter: blur(0.4px);
+  }
+
+  .style-card--bg-ascii .style-card__preview {
+    background:
+      repeating-linear-gradient(0deg, oklch(0.72 0.08 300 / 0.18) 0 1px, transparent 1px 9px),
+      repeating-linear-gradient(90deg, oklch(0.55 0.06 280 / 0.14) 0 1px, transparent 1px 11px),
+      oklch(0.16 0.03 285);
+    font-family: var(--mono);
+  }
+
+  .style-card--bg-mesh .style-card__preview {
+    background:
+      radial-gradient(circle at 18% 24%, oklch(0.62 0.16 330 / 0.9), transparent 48%),
+      radial-gradient(circle at 82% 18%, oklch(0.52 0.12 250 / 0.75), transparent 45%),
+      radial-gradient(circle at 64% 86%, oklch(0.48 0.14 20 / 0.7), transparent 50%),
+      oklch(0.14 0.02 280);
+  }
+
+  .style-card--bg-aurora .style-card__preview {
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 40%, oklch(0.58 0.18 300 / 0.85), transparent 60%),
+      radial-gradient(ellipse 70% 55% at 78% 62%, oklch(0.55 0.15 200 / 0.7), transparent 58%),
+      oklch(0.12 0.02 265);
+  }
+
+  .style-card--bg-vinyl .style-card__preview {
+    background:
+      repeating-radial-gradient(circle at 50% 50%, transparent 0 3px, oklch(0.35 0.04 280 / 0.22) 3px 4px),
+      radial-gradient(circle at 50% 50%, oklch(0.42 0.1 300 / 0.55), oklch(0.14 0.02 280) 72%);
+  }
+
+  .style-card--btn-logo-color .btn-swatch--spotify {
+    background: linear-gradient(90deg, oklch(0.28 0.006 265 / 0.8), oklch(0.28 0.006 265 / 0.8));
+    box-shadow: inset 2.2rem 0 0 #1ed760;
+  }
+
+  .style-card--btn-colored-border .btn-swatch--spotify {
+    border: 1px solid #1ed760;
+    background: oklch(0.24 0.006 265 / 0.75);
+  }
+
+  .style-card--btn-gradient-lr .btn-swatch--spotify {
+    background: linear-gradient(90deg, oklch(0.28 0.006 265 / 0.85) 0%, color-mix(in srgb, #1ed760 35%, oklch(0.28 0.006 265)) 100%);
+  }
+
+  .style-card--btn-gradient-logo .btn-swatch--spotify {
+    background: linear-gradient(90deg, oklch(0.28 0.006 265 / 0.85) 0%, color-mix(in srgb, #1ed760 42%, oklch(0.28 0.006 265)) 100%);
+    box-shadow: inset 1.5rem 0 0 #1ed760;
+  }
+
+  .style-card--btn-full-color .btn-swatch--spotify {
+    background: #1ed760;
+  }
+
+  .style-card--btn-full-color .btn-swatch--apple {
+    background: #fa5a6e;
+  }
+
+  .style-card__copy {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  .style-card__label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .style-card__hint {
+    font-size: var(--text-xs);
+    line-height: 1.35;
+    color: var(--muted);
+  }
+</style>

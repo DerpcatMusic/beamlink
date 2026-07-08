@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BUTTON_STYLES, PAGE_BACKGROUND_STYLES } from "@lib/page-style";
 import { platformLabels } from "@lib/types";
 
 const isrcPattern = /^[A-Za-z]{2}[A-Za-z0-9]{3}\d{7}$/;
@@ -48,7 +49,9 @@ export const linkBodySchema = z.object({
   spotifyOpenBehavior: z.enum(["web", "playlist_context", "app_first"]).optional(),
   spotifyContextUrl: z.url().or(z.literal("")).nullable().optional(),
   status: z.enum(["draft", "published", "archived"]).optional(),
-  releaseAt: z.string().nullable().optional()
+  releaseAt: z.string().nullable().optional(),
+  pageBackgroundStyle: z.enum(PAGE_BACKGROUND_STYLES).optional(),
+  buttonStyle: z.enum(BUTTON_STYLES).optional()
 });
 
 export const subscribeBodySchema = z.object({

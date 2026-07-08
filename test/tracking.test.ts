@@ -42,6 +42,8 @@ function baseLink(overrides: Partial<SmartLink> = {}): SmartLink {
     paid_click_event_name: "Stream_Click_Paid",
     spotify_open_behavior: "web",
     spotify_context_url: null,
+    page_background_style: "blur",
+    button_style: "monochrome",
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-01-01T00:00:00Z",
     published_at: "2026-01-01T00:00:00Z",
