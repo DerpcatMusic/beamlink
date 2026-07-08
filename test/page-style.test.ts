@@ -7,6 +7,7 @@ import {
   normalizePageBackgroundStyle,
   platformButtonInk,
   platformBrandStyle,
+  platformIconInk,
   platformIconTint
 } from "../src/lib/page-style";
 
@@ -43,7 +44,12 @@ describe("platform helpers", () => {
     expect(platformIconTint("monochrome")).toBe(false);
     expect(platformIconTint("logo-color")).toBe(true);
     expect(platformIconTint("gradient-logo")).toBe(true);
-    expect(platformIconTint("full-color")).toBe(true);
+    expect(platformIconTint("full-color")).toBe(false);
+  });
+
+  it("uses ink icons on full-color fills", () => {
+    expect(platformIconInk("full-color")).toBe(true);
+    expect(platformIconInk("logo-color")).toBe(false);
   });
 
   it("picks readable ink on brand fills", () => {

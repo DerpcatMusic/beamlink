@@ -543,23 +543,47 @@ const countdownFallback = releaseAt
     color: var(--foreground);
   }
 
-  .destination:first-child {
+  .smart-page--btn-monochrome .destination:first-child,
+  .smart-page--btn-logo-color .destination:first-child,
+  .smart-page--btn-colored-border .destination:first-child,
+  .smart-page--btn-gradient-lr .destination:first-child,
+  .smart-page--btn-gradient-logo .destination:first-child {
     background: oklch(0.97 0.005 265);
     border-color: transparent;
     color: oklch(0.17 0.006 265);
     box-shadow: 0 8px 24px -12px oklch(0 0 0 / 0.6);
   }
 
-  .destination:first-child .chevron {
+  .smart-page--btn-monochrome .destination:first-child .chevron,
+  .smart-page--btn-logo-color .destination:first-child .chevron,
+  .smart-page--btn-colored-border .destination:first-child .chevron,
+  .smart-page--btn-gradient-lr .destination:first-child .chevron,
+  .smart-page--btn-gradient-logo .destination:first-child .chevron {
     color: oklch(0.17 0.006 265 / 0.55);
   }
 
-  .destination:first-child:hover {
+  .smart-page--btn-monochrome .destination:first-child:hover,
+  .smart-page--btn-logo-color .destination:first-child:hover,
+  .smart-page--btn-colored-border .destination:first-child:hover,
+  .smart-page--btn-gradient-lr .destination:first-child:hover,
+  .smart-page--btn-gradient-logo .destination:first-child:hover {
     background: oklch(1 0 0);
   }
 
-  .destination:first-child:hover .chevron {
+  .smart-page--btn-monochrome .destination:first-child:hover .chevron,
+  .smart-page--btn-logo-color .destination:first-child:hover .chevron,
+  .smart-page--btn-colored-border .destination:first-child:hover .chevron,
+  .smart-page--btn-gradient-lr .destination:first-child:hover .chevron,
+  .smart-page--btn-gradient-logo .destination:first-child:hover .chevron {
     color: oklch(0.17 0.006 265);
+  }
+
+  .smart-page--btn-monochrome .destination:first-child:focus-visible,
+  .smart-page--btn-logo-color .destination:first-child:focus-visible,
+  .smart-page--btn-colored-border .destination:first-child:focus-visible,
+  .smart-page--btn-gradient-lr .destination:first-child:focus-visible,
+  .smart-page--btn-gradient-logo .destination:first-child:focus-visible {
+    outline-color: oklch(0.17 0.006 265);
   }
 
   .destinations.count-1 .destination {
@@ -570,10 +594,6 @@ const countdownFallback = releaseAt
   .destination:focus-visible {
     outline: 2px solid var(--foreground);
     outline-offset: 2px;
-  }
-
-  .destination:first-child:focus-visible {
-    outline-color: oklch(0.17 0.006 265);
   }
 
   .smart-page--btn-logo-color .destination :global(.platform-icon) {
@@ -611,6 +631,10 @@ const countdownFallback = releaseAt
     backdrop-filter: none;
   }
 
+  .smart-page--btn-full-color .destination :global(.platform-icon) {
+    color: var(--platform-ink);
+  }
+
   .smart-page--btn-full-color .destination .chevron {
     color: color-mix(in srgb, var(--platform-ink) 55%, transparent);
   }
@@ -629,33 +653,6 @@ const countdownFallback = releaseAt
     background: var(--platform-brand);
     color: var(--platform-ink);
     box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--platform-brand) 55%, oklch(0 0 0));
-  }
-
-  .smart-page--btn-monochrome .destination:first-child,
-  .smart-page--btn-logo-color .destination:first-child,
-  .smart-page--btn-colored-border .destination:first-child,
-  .smart-page--btn-gradient-lr .destination:first-child,
-  .smart-page--btn-gradient-logo .destination:first-child {
-    background: oklch(0.97 0.005 265);
-    border-color: transparent;
-    color: oklch(0.17 0.006 265);
-    box-shadow: 0 8px 24px -12px oklch(0 0 0 / 0.6);
-  }
-
-  .smart-page--btn-monochrome .destination:first-child .chevron,
-  .smart-page--btn-logo-color .destination:first-child .chevron,
-  .smart-page--btn-colored-border .destination:first-child .chevron,
-  .smart-page--btn-gradient-lr .destination:first-child .chevron,
-  .smart-page--btn-gradient-logo .destination:first-child .chevron {
-    color: oklch(0.17 0.006 265 / 0.55);
-  }
-
-  .smart-page--btn-monochrome .destination:first-child:hover,
-  .smart-page--btn-logo-color .destination:first-child:hover,
-  .smart-page--btn-colored-border .destination:first-child:hover,
-  .smart-page--btn-gradient-lr .destination:first-child:hover,
-  .smart-page--btn-gradient-logo .destination:first-child:hover {
-    background: oklch(1 0 0);
   }
 
   .smart-page--btn-logo-color .destination:first-child :global(.platform-icon) {

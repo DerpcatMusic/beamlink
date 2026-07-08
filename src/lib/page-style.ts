@@ -67,7 +67,12 @@ export function normalizeButtonStyle(value: string | null | undefined): ButtonSt
 }
 
 export function platformIconTint(buttonStyle: ButtonStyle): boolean {
-  return buttonStyle === "logo-color" || buttonStyle === "gradient-logo" || buttonStyle === "full-color";
+  return buttonStyle === "logo-color" || buttonStyle === "gradient-logo";
+}
+
+/** Full-color fills use ink on icons — brand tint on brand bg is invisible. */
+export function platformIconInk(buttonStyle: ButtonStyle): boolean {
+  return buttonStyle === "full-color";
 }
 
 export function platformBrandStyle(platform: Platform): string {
