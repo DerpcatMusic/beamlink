@@ -84,8 +84,33 @@ const countdownFallback = releaseAt
   <div class="page-backdrop" aria-hidden="true">
     <div class="artwork-bg"></div>
     {pageBackgroundStyle === "ascii" && <div class="ascii-overlay"></div>}
-    {(pageBackgroundStyle === "mesh" || pageBackgroundStyle === "aurora" || pageBackgroundStyle === "vinyl") && (
-      <div class:list={["bg-effect", `bg-effect--${pageBackgroundStyle}`]}></div>
+    {pageBackgroundStyle === "mesh" && (
+      <div class="bg-effect bg-effect--mesh">
+        <div class="mesh-base"></div>
+        <div class="mesh-orbs">
+          <span class="mesh-orb mesh-orb--1"></span>
+          <span class="mesh-orb mesh-orb--2"></span>
+          <span class="mesh-orb mesh-orb--3"></span>
+          <span class="mesh-orb mesh-orb--4"></span>
+          <span class="mesh-orb mesh-orb--5"></span>
+        </div>
+      </div>
+    )}
+    {pageBackgroundStyle === "aurora" && (
+      <div class="bg-effect bg-effect--aurora">
+        <span class="aurora-sheet aurora-sheet--a"></span>
+        <span class="aurora-sheet aurora-sheet--b"></span>
+        <span class="aurora-sheet aurora-sheet--c"></span>
+      </div>
+    )}
+    {pageBackgroundStyle === "vinyl" && (
+      <div class="bg-effect bg-effect--vinyl">
+        <div class="vinyl-disc">
+          <div class="vinyl-grooves"></div>
+          <div class="vinyl-shine"></div>
+          <div class="vinyl-label"></div>
+        </div>
+      </div>
     )}
   </div>
   <div class="page-scrim" aria-hidden="true"></div>
@@ -242,15 +267,20 @@ const countdownFallback = releaseAt
     max-width: none;
     min-height: 100%;
     justify-content: start;
-    gap: 0.85rem;
+    gap: clamp(0.75rem, 2.5vw, 1rem);
     margin-inline: 0;
-    padding: clamp(1rem, 4vw, 1.75rem) clamp(1rem, 5vw, 2rem) 2rem;
+    padding: clamp(0.85rem, 3.5vw, 1.5rem) clamp(0.85rem, 4vw, 1.25rem) 1.25rem;
     box-sizing: border-box;
   }
 
   .smart-page--preview-pane .page-backdrop {
     position: absolute;
-    inset: -5rem -4rem;
+    inset: -18vmin;
+  }
+
+  .smart-page--preview-pane .page-scrim {
+    position: absolute;
+    inset: 0;
   }
 
   .page-backdrop {
@@ -284,93 +314,269 @@ const countdownFallback = releaseAt
     filter: blur(3.8rem) saturate(1.38) brightness(1.22);
   }
 
+  .smart-page--bg-mesh .artwork-bg,
+  .smart-page--bg-aurora .artwork-bg,
+  .smart-page--bg-vinyl .artwork-bg {
+    opacity: 0.48;
+    filter: blur(2.6rem) saturate(1.42) brightness(1.14);
+    transform: scale(1.1);
+  }
+
+  .smart-page--bg-vinyl .artwork-bg {
+    mask-image: radial-gradient(circle at 50% var(--vinyl-disc-y, 34%), black 0%, black 22%, transparent 36%);
+    opacity: 0.62;
+  }
+
   .smart-page--embedded.smart-page--bg-blur .artwork-bg,
   .smart-page--embedded.smart-page--bg-ascii .artwork-bg {
     filter: blur(3rem) saturate(1.28) brightness(1.14);
     transform: scale(1);
   }
 
+  .smart-page--embedded.smart-page--bg-mesh .artwork-bg,
+  .smart-page--embedded.smart-page--bg-aurora .artwork-bg,
+  .smart-page--embedded.smart-page--bg-vinyl .artwork-bg {
+    filter: blur(2.2rem) saturate(1.32) brightness(1.1);
+    transform: scale(1.04);
+  }
+
   .smart-page--bg-ascii .artwork-bg {
-    filter: blur(2.2rem) saturate(1.2) brightness(1.08) contrast(1.12);
+    opacity: 0.72;
+    filter: blur(1.4rem) saturate(1.25) brightness(0.92) contrast(1.28);
     image-rendering: pixelated;
   }
 
   .ascii-overlay {
     position: absolute;
     inset: 0;
+    background-color: color-mix(in oklch, var(--background) 55%, transparent);
     background-image: var(--ascii-pattern);
-    background-size: 260px 200px;
-    mix-blend-mode: soft-light;
-    opacity: 0.72;
+    background-size: 200px 160px;
+    mix-blend-mode: normal;
+    opacity: 1;
+  }
+
+  .smart-page--bg-mesh .page-scrim,
+  .smart-page--bg-aurora .page-scrim,
+  .smart-page--bg-vinyl .page-scrim,
+  .smart-page--bg-ascii .page-scrim {
+    background:
+      linear-gradient(180deg, oklch(0.02 0.006 260 / 0.16), oklch(0.02 0.006 260 / 0.34)),
+      oklch(0.06 0.01 260 / 0.28);
   }
 
   .bg-effect {
     position: absolute;
     inset: 0;
+    overflow: hidden;
+    isolation: isolate;
   }
 
+  /* --- Mesh: Aceternity-style animated orbs --- */
   .bg-effect--mesh {
-    background:
-      radial-gradient(ellipse 90% 70% at 12% 18%, color-mix(in oklch, var(--page-tint) 88%, var(--primary) 12%) 0%, transparent 58%),
-      radial-gradient(ellipse 75% 60% at 88% 14%, color-mix(in oklch, var(--primary) 72%, var(--page-tint) 28%) 0%, transparent 52%),
-      radial-gradient(ellipse 80% 65% at 72% 88%, color-mix(in oklch, var(--page-tint) 65%, var(--surface) 35%) 0%, transparent 55%),
-      radial-gradient(ellipse 55% 45% at 42% 58%, color-mix(in oklch, var(--primary) 45%, transparent) 0%, transparent 62%),
-      var(--background);
+    --mesh-orb-size: clamp(11rem, 52vmin, 30rem);
   }
 
-  .bg-effect--aurora::before,
-  .bg-effect--aurora::after {
-    content: "";
+  .mesh-base {
     position: absolute;
-    inset: -20%;
+    inset: 0;
+    background: linear-gradient(
+      155deg,
+      color-mix(in oklch, var(--background) 45%, var(--page-tint)),
+      var(--background) 72%
+    );
+  }
+
+  .mesh-orbs {
+    position: absolute;
+    inset: -22%;
+    filter: blur(3.2rem);
+  }
+
+  .mesh-orb {
+    position: absolute;
+    width: var(--mesh-orb-size);
+    height: var(--mesh-orb-size);
+    top: calc(50% - var(--mesh-orb-size) / 2);
+    left: calc(50% - var(--mesh-orb-size) / 2);
     border-radius: 50%;
-    filter: blur(4.5rem);
-    opacity: 0.72;
+    mix-blend-mode: hard-light;
+    opacity: 0.88;
+    will-change: transform;
   }
 
-  .bg-effect--aurora::before {
-    background: radial-gradient(circle, color-mix(in oklch, var(--primary) 70%, transparent) 0%, transparent 68%);
-    transform: translate(-8%, -6%);
+  .mesh-orb--1 {
+    background: radial-gradient(circle, color-mix(in oklch, var(--primary) 72%, var(--page-tint)) 0%, transparent 58%);
+    transform-origin: center;
+    animation: mesh-float-y 28s cubic-bezier(0.25, 1, 0.5, 1) infinite;
   }
 
-  .bg-effect--aurora::after {
-    background: radial-gradient(circle, color-mix(in oklch, var(--page-tint) 75%, var(--primary) 25%) 0%, transparent 70%);
-    transform: translate(10%, 8%);
+  .mesh-orb--2 {
+    background: radial-gradient(circle, color-mix(in oklch, var(--page-tint) 82%, var(--primary)) 0%, transparent 56%);
+    transform-origin: calc(50% - 14vmin);
+    animation: mesh-orbit 22s cubic-bezier(0.22, 1, 0.36, 1) infinite reverse;
   }
 
+  .mesh-orb--3 {
+    background: radial-gradient(circle, color-mix(in oklch, var(--primary) 58%, transparent) 0%, transparent 62%);
+    transform-origin: calc(50% + 12vmin);
+    animation: mesh-sway 26s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  }
+
+  .mesh-orb--4 {
+    background: radial-gradient(circle, color-mix(in oklch, var(--page-tint) 68%, var(--surface)) 0%, transparent 60%);
+    transform-origin: calc(50% - 8vmin) calc(50% + 10vmin);
+    animation: mesh-orbit 32s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  .mesh-orb--5 {
+    background: radial-gradient(circle, color-mix(in oklch, var(--primary) 48%, var(--page-tint)) 0%, transparent 64%);
+    transform-origin: calc(50% + 16vmin) calc(50% - 6vmin);
+    animation: mesh-float-y 24s cubic-bezier(0.25, 1, 0.5, 1) infinite reverse;
+  }
+
+  @keyframes mesh-float-y {
+    0%, 100% { transform: translateY(-16%) scale(1); }
+    50% { transform: translateY(16%) scale(1.06); }
+  }
+
+  @keyframes mesh-orbit {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.08); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+
+  @keyframes mesh-sway {
+    0%, 100% { transform: translate(-14%, -10%) scale(1); }
+    50% { transform: translate(14%, 10%) scale(1.05); }
+  }
+
+  /* --- Aurora: elliptical drifting sheets --- */
   .bg-effect--aurora {
-    background: linear-gradient(165deg, var(--background), color-mix(in oklch, var(--page-tint) 55%, var(--background)));
+    background: linear-gradient(
+      168deg,
+      color-mix(in oklch, var(--background) 62%, transparent),
+      color-mix(in oklch, var(--page-tint) 42%, var(--background))
+    );
   }
 
-  .bg-effect--vinyl {
+  .aurora-sheet {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    border-radius: 50%;
+    filter: blur(3.6rem);
+    mix-blend-mode: screen;
+    opacity: 0.78;
+    will-change: transform;
+  }
+
+  .aurora-sheet--a {
     background:
-      repeating-radial-gradient(
-        circle at 50% 42%,
-        transparent 0 2px,
-        color-mix(in oklch, var(--foreground) 8%, transparent) 2px 3px
-      ),
-      radial-gradient(circle at 50% 42%, color-mix(in oklch, var(--page-tint) 70%, var(--primary) 30%) 0%, transparent 38%),
-      radial-gradient(circle at 50% 42%, color-mix(in oklch, var(--page-tint) 45%, var(--background)) 0%, var(--background) 72%);
+      radial-gradient(ellipse 82% 48% at 48% 8%, color-mix(in oklch, var(--primary) 62%, transparent) 0%, transparent 68%),
+      radial-gradient(ellipse 58% 38% at 28% 18%, color-mix(in oklch, var(--page-tint) 55%, transparent) 0%, transparent 62%);
+    animation: aurora-wave 20s cubic-bezier(0.25, 1, 0.5, 1) infinite;
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .bg-effect--aurora::before {
-      animation: aurora-drift-a 22s ease-in-out infinite alternate;
-    }
-
-    .bg-effect--aurora::after {
-      animation: aurora-drift-b 28s ease-in-out infinite alternate;
-    }
+  .aurora-sheet--b {
+    background:
+      radial-gradient(ellipse 74% 42% at 72% 12%, color-mix(in oklch, var(--page-tint) 58%, var(--primary)) 0%, transparent 64%);
+    animation: aurora-wave 20s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+    animation-delay: -10s;
   }
 
-  @keyframes aurora-drift-a {
-    from { transform: translate(-12%, -8%) scale(1); }
-    to { transform: translate(6%, 4%) scale(1.08); }
+  .aurora-sheet--c {
+    background:
+      radial-gradient(ellipse 68% 36% at 40% 22%, color-mix(in oklch, var(--primary) 42%, var(--page-tint)) 0%, transparent 58%);
+    opacity: 0.55;
+    filter: blur(4.2rem);
+    animation: aurora-drift-c 26s cubic-bezier(0.22, 1, 0.36, 1) infinite alternate;
   }
 
-  @keyframes aurora-drift-b {
-    from { transform: translate(8%, 6%) scale(1.02); }
-    to { transform: translate(-6%, -4%) scale(0.96); }
+  @keyframes aurora-wave {
+    0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    25% { transform: translate(4%, -3%) rotate(5deg) scale(1.04); }
+    50% { transform: translate(-3%, 4%) rotate(-4deg) scale(1.08); }
+    75% { transform: translate(2%, -2%) rotate(2deg) scale(1.03); }
+  }
+
+  @keyframes aurora-drift-c {
+    from { transform: translate(-6%, 4%) scale(0.96); }
+    to { transform: translate(8%, -5%) scale(1.06); }
+  }
+
+  /* --- Vinyl: true circular disc --- */
+  .bg-effect--vinyl {
+    --vinyl-disc-y: 34%;
+    --vinyl-size: min(128vmin, 40rem);
+  }
+
+  .vinyl-disc {
+    position: absolute;
+    left: 50%;
+    top: var(--vinyl-disc-y);
+    translate: -50% -50%;
+    width: var(--vinyl-size);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: hidden;
+    mask-image: radial-gradient(circle, #000 64%, transparent 78%);
+  }
+
+  .vinyl-grooves {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: repeating-radial-gradient(
+      circle at center,
+      transparent 0 1.3px,
+      color-mix(in oklch, var(--foreground) 20%, transparent) 1.3px 2.2px
+    );
+    opacity: 0.92;
+  }
+
+  .vinyl-shine {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 205deg,
+      transparent 0deg,
+      oklch(1 0 0 / 0.08) 32deg,
+      oklch(1 0 0 / 0.04) 52deg,
+      transparent 78deg,
+      transparent 198deg,
+      oklch(1 0 0 / 0.06) 222deg,
+      transparent 258deg
+    );
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+  }
+
+  .vinyl-label {
+    position: absolute;
+    inset: 33%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklch, var(--page-tint) 78%, var(--primary)) 0%,
+      color-mix(in oklch, var(--page-tint) 38%, var(--background)) 100%
+    );
+    box-shadow: 0 0 0 1px oklch(0 0 0 / 0.22) inset;
+  }
+
+  .smart-page--preview-pane .bg-effect--mesh {
+    --mesh-orb-size: clamp(8rem, 62vmin, 22rem);
+  }
+
+  .smart-page--preview-pane .mesh-orbs {
+    filter: blur(2.4rem);
+  }
+
+  .smart-page--preview-pane .bg-effect--vinyl {
+    --vinyl-size: min(135vmin, 26rem);
   }
 
   .page-scrim {
@@ -392,12 +598,13 @@ const countdownFallback = releaseAt
     display: grid;
     justify-items: center;
     gap: 1rem;
+    width: 100%;
     text-align: center;
   }
 
   .artwork {
-    width: min(74vw, 18rem);
-    height: min(74vw, 18rem);
+    width: min(74vw, 20rem);
+    height: auto;
     aspect-ratio: 1;
     object-fit: cover;
     border-radius: 16px;
@@ -406,6 +613,37 @@ const countdownFallback = releaseAt
       0 1px 0 oklch(1 0 0 / 0.12) inset,
       0 0 0 1px oklch(0 0 0 / 0.35),
       0 24px 60px -18px oklch(0 0 0 / 0.7);
+  }
+
+  .smart-page--preview-pane .release {
+    gap: clamp(0.65rem, 2vw, 0.9rem);
+  }
+
+  .smart-page--preview-pane .artwork {
+    width: min(72vw, 100%);
+    max-width: 100%;
+    border-radius: clamp(12px, 2.5vw, 16px);
+  }
+
+  .smart-page--preview-pane .copy {
+    width: 100%;
+    max-width: none;
+  }
+
+  .smart-page--preview-pane h1 {
+    max-width: none;
+    font-size: clamp(1.35rem, 5.8vw, 2rem);
+  }
+
+  .smart-page--preview-pane .destinations {
+    margin-top: 0;
+  }
+
+  .smart-page--preview-pane .release,
+  .smart-page--preview-pane .subscribe,
+  .smart-page--preview-pane .destinations,
+  .smart-page--preview-pane .artwork {
+    animation: none !important;
   }
 
   .smart-page--embedded .artwork {
@@ -691,6 +929,10 @@ const countdownFallback = releaseAt
   }
 
   @media (prefers-reduced-motion: no-preference) {
+    .vinyl-grooves {
+      animation: vinyl-spin 52s linear infinite;
+    }
+
     .release,
     .subscribe,
     .destinations {
@@ -728,10 +970,15 @@ const countdownFallback = releaseAt
     }
   }
 
+  @keyframes vinyl-spin {
+    to { rotate: 360deg; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .bg-effect--aurora::before,
-    .bg-effect--aurora::after {
-      animation: none;
+    .mesh-orb,
+    .aurora-sheet,
+    .vinyl-grooves {
+      animation: none !important;
     }
 
     .destination:hover,

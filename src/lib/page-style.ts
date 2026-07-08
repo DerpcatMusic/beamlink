@@ -96,28 +96,39 @@ export function buttonClasses(style: ButtonStyle): string {
   return `smart-page--btn-${style}`;
 }
 
+/** Fixed palette for admin style-card thumbnails. */
+export const STYLE_CARD_PREVIEW_PALETTE: TrackPaletteVars = {
+  "--page-tint": "oklch(0.55 0.14 320)",
+  "--primary": "oklch(0.72 0.12 300)",
+  "--muted": "oklch(0.62 0.05 285)"
+};
+
 /** SVG tile for ASCII-style backgrounds — palette-driven, no image decode. */
 export function asciiPatternDataUri(vars: TrackPaletteVars): string {
   const tint = vars["--page-tint"] ?? "oklch(0.2 0.04 280)";
   const accent = vars["--primary"] ?? "oklch(0.72 0.12 300)";
   const muted = vars["--muted"] ?? "oklch(0.55 0.03 280)";
-  const chars = [".", ":", "-", "=", "+", "*", "#", "%", "@"];
+  const chars = " .,:;i1tfLCG08@#%*+=-";
 
-  const rows: string[] = [];
-  for (let y = 0; y < 12; y += 1) {
-    for (let x = 0; x < 18; x += 1) {
+  const rows: string[] = [
+    `<rect width="100%" height="100%" fill="${escapeXml(tint)}" opacity="0.22"/>`,
+    `<rect width="100%" height="100%" fill="oklch(0.08 0.01 265)" opacity="0.35"/>`
+  ];
+
+  for (let y = 0; y < 16; y += 1) {
+    for (let x = 0; x < 22; x += 1) {
       const index = (x * 7 + y * 11 + x * y) % chars.length;
       const color = index % 3 === 0 ? accent : index % 3 === 1 ? tint : muted;
       const char = chars[index] ?? ".";
-      const px = 6 + x * 14;
-      const py = 10 + y * 16;
+      const px = 4 + x * 9;
+      const py = 11 + y * 10;
       rows.push(
-        `<text x="${px}" y="${py}" fill="${escapeXml(color)}" font-family="ui-monospace,monospace" font-size="11" opacity="0.55">${char}</text>`
+        `<text x="${px}" y="${py}" fill="${escapeXml(color)}" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="9" font-weight="700" opacity="0.88">${escapeXml(char)}</text>`
       );
     }
   }
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="260" height="200" viewBox="0 0 260 200">${rows.join("")}</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="160" viewBox="0 0 200 160">${rows.join("")}</svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 

@@ -17,4 +17,14 @@ const classes = ["beamlink-link", bodyClass].filter(Boolean).join(" ");
   .beamlink-link {
     min-height: 100dvh;
   }
+
+  :global(body.beamlink-link--preview-pane) {
+    min-height: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  :global(html:has(body.beamlink-link--preview-pane)) {
+    height: 100%;
+  }
 </style>

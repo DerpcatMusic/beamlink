@@ -67,6 +67,12 @@
       timer = window.setTimeout(refreshPreview, debounceMs);
     }
 
+    function syncStyleCardSelection(name) {
+      for (const input of root.querySelectorAll(`input[name="${name}"]`)) {
+        input.closest(".style-card")?.classList.toggle("is-selected", input.checked);
+      }
+    }
+
     function bindPreviewUpdates() {
       const watched = root.querySelectorAll(
         "input, select, textarea, input[name='pageBackgroundStyle'], input[name='buttonStyle']"
@@ -74,6 +80,13 @@
       for (const element of watched) {
         element.addEventListener("input", schedulePreview);
         element.addEventListener("change", schedulePreview);
+      }
+
+      for (const name of ["pageBackgroundStyle", "buttonStyle"]) {
+        for (const input of root.querySelectorAll(`input[name="${name}"]`)) {
+          input.addEventListener("change", () => syncStyleCardSelection(name));
+        }
+        syncStyleCardSelection(name);
       }
     }
 

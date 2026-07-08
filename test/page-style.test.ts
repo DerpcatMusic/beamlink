@@ -66,6 +66,8 @@ describe("asciiPatternDataUri", () => {
       "--muted": "rgb(200 180 200)"
     });
     expect(uri.startsWith('url("data:image/svg+xml,')).toBe(true);
-    expect(decodeURIComponent(uri)).toContain("<text");
+    const decoded = decodeURIComponent(uri);
+    expect(decoded).toContain("<text");
+    expect(decoded).toContain("font-weight=\"700\"");
   });
 });
