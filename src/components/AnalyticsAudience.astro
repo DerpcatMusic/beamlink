@@ -1,0 +1,58 @@
+---
+import AnalyticsTabs from "@components/AnalyticsTabs.astro";
+import BreakdownList, { type BreakdownRow } from "@components/BreakdownList.astro";
+import CollapsibleSection from "@components/CollapsibleSection.astro";
+
+interface Props {
+  rangeLabel: string;
+  platformRows: BreakdownRow[];
+  countryRows: BreakdownRow[];
+  cityRows: BreakdownRow[];
+  deviceRows: BreakdownRow[];
+  browserRows: BreakdownRow[];
+  osRows: BreakdownRow[];
+}
+
+const { rangeLabel, platformRows, countryRows, cityRows, deviceRows, browserRows, osRows } = Astro.props;
+const tabs = [
+  { id: "platforms", label: "Platforms" },
+  { id: "countries", label: "Countries" },
+  { id: "cities", label: "Cities" },
+  { id: "devices", label: "Devices" },
+  { id: "tech", label: "Tech" }
+];
+---
+
+<CollapsibleSection id="audience" title="Audience" subtitle={rangeLabel} defaultOpen={true}>
+  <AnalyticsTabs groupId="audience" tabs={tabs} activeId="platforms">
+    <div data-tab-panel="platforms" id="audience-panel-platforms" role="tabpanel" aria-labelledby="audience-tab-platforms">
+      <BreakdownList rows={platformRows} empty="No platform clicks yet." />
+    </div>
+    <div data-tab-panel="countries" id="audience-panel-countries" role="tabpanel" hidden aria-labelledby="audience-tab-countries">
+      <BreakdownList rows={countryRows} empty="No country data yet." />
+    </div>
+    <div data-tab-panel="cities" id="audience-panel-cities" role="tabpanel" hidden aria-labelledby="audience-tab-cities">
+      <BreakdownList rows={cityRows} empty="No city data yet." />
+    </div>
+    <div data-tab-panel="devices" id="audience-panel-devices" role="tabpanel" hidden aria-labelledby="audience-tab-devices">
+      <BreakdownList rows={deviceRows} empty="No device data yet." />
+    </div>
+    <div data-tab-panel="tech" id="audience-panel-tech" role="tabpanel" hidden aria-labelledby="audience-tab-tech">
+      <div class="tech-split">
+        <div>
+          <h3>Browsers</h3>
+          <BreakdownList rows={browserRows} empty="No browser data yet." limit={5} />
+        </div>
+        <div>
+          <h3>Operating systems</h3>
+          <BreakdownList rows={osRows} empty="No OS data yet." limit={5} />
+        </div>
+      </div>
+    </div>
+  </AnalyticsTabs>
+</CollapsibleSection>
+
+<style>
+  .tech-split { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1.25rem 2rem; }
+  h3 { margin: 0 0 0.5rem; font-size: var(--text-sm); font-weight: 600; color: var(--foreground); }
+</style>

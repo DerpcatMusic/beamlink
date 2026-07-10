@@ -4,15 +4,14 @@ import AdminLinkNav from "@components/AdminLinkNav.astro";
 import Button from "@components/Button.astro";
 import Chart from "@components/Chart.astro";
 import HourHeatmap from "@components/HourHeatmap.astro";
-import BreakdownList from "@components/BreakdownList.astro";
-import AnalyticsTabs from "@components/AnalyticsTabs.astro";
-import MetaCampaignTable from "@components/MetaCampaignTable.astro";
 import CollapsibleSection from "@components/CollapsibleSection.astro";
+import AnalyticsAudience from "@components/AnalyticsAudience.astro";
+import AnalyticsAttribution from "@components/AnalyticsAttribution.astro";
+import AnalyticsMetaDelivery from "@components/AnalyticsMetaDelivery.astro";
 import Icon from "@components/Icon.astro";
 import PlatformIcon from "@components/PlatformIcon.astro";
 import SettingsModal from "@components/SettingsModal.astro";
 import SubscriberManager from "@components/SubscriberManager.astro";
-import ScreenshotSafeToggle from "@components/ScreenshotSafeToggle.astro";
 import { getLinkById, listSubscribers } from "@lib/db";
 import { getRuntimeEnv, requireAdmin, publicBaseUrl } from "@lib/runtime";
 import { effectiveLinkMode, daysUntilRelease } from "@lib/effective-mode";
@@ -38,16 +37,14 @@ import {
 } from "@lib/stats";
 import { artworkPublicPath } from "@lib/artwork";
 import { platformBrandColors } from "@lib/platform-brand";
-import { getMetaAccessToken, getMetaAdAccountId, getMetaConversionValue, getMetaCurrency, getMetaPixelId, metaEventsManagerUrl } from "@lib/settings";
+import { getMetaAccessToken, getMetaAdAccountId, getMetaConversionValue, getMetaCurrency, getMetaPixelId } from "@lib/settings";
 import {
-  analyzeCapiMatchKeys,
   countSentCapiConversions,
   countSentCapiByEventName,
   getCapiDeliveryStats,
-  listCapiLogsByLink,
-  parseCapiLogView
+  listCapiLogsByLink
 } from "@lib/capi-log";
-import { formatMatchKeyLabel, getMetaDatasetQuality, pickMetaEventQuality } from "@lib/meta-quality";
+import { getMetaDatasetQuality } from "@lib/meta-quality";
 import {
   buildCampaignPerformance,
   getMetaAdsInsights,
@@ -55,6 +52,7 @@ import {
 } from "@lib/meta-ads-insights";
 import { resolveClickEventName, resolveViewEventName } from "@lib/effective-mode";
 import { platformLabels } from "@lib/types";
+import { sectionResult } from "@lib/analytics-loader";
 
 const env = getRuntimeEnv(Astro);
 const blocked = await requireAdmin(Astro.request, env);
@@ -74,82 +72,66 @@ const currency = getMetaCurrency(env);
 const clickEventName = resolveClickEventName(link);
 const viewEventName = resolveViewEventName(link);
 const metaDays = isHourly ? Math.max(1, Math.ceil(options.hours / 24)) : options.days;
-const [funnel, timeseries, heatmap, platformClicks, geoRows, cityRows, campaignRows, linkCampaignAttribution, adRows, placementRows, referrerRows, deviceRows, browserRows, osRows, uniqueVisitors, pixelId, metaAccessToken, metaAdAccountId, linkCapiLogs, capiDelivery, capiSentConversions, capiSentViewContent, capiSentLegacyStreamClick, metaQuality] = await Promise.all([
-  getFunnelStats(env, link.id, options.days),
-  isHourly
-    ? getHourlyTimeseries(env, link.id, options.hours)
-    : options.unique
-      ? getUniqueTimeseries(env, link.id, options.days)
-      : getLinkTimeseries(env, link.id, options.days),
-  getHourHeatmap(env, link.id, options.days),
-  getPlatformClicks(env, link.id),
-  getGeoBreakdown(env, link.id, options.days),
-  getCityBreakdown(env, link.id, options.days),
-  getCampaignBreakdown(env, link.id, metaDays),
-  getLinkCampaignAttribution(env, link.id, metaDays),
-  getAdBreakdown(env, link.id, metaDays),
-  getPlacementBreakdown(env, link.id, metaDays),
-  getReferrerBreakdown(env, link.id, metaDays),
-  getDeviceBreakdown(env, link.id, options.days),
-  getBrowserBreakdown(env, link.id, options.days),
-  getOsBreakdown(env, link.id, options.days),
-  getUniqueVisitors(env, link.id, options.days),
-  getMetaPixelId(env),
-  getMetaAccessToken(env),
-  getMetaAdAccountId(env),
-  listCapiLogsByLink(env, link.id, 20, options.days),
-  getCapiDeliveryStats(env, link.id, options.days),
-  countSentCapiConversions(env, link.id, options.days, clickEventName),
-  countSentCapiByEventName(env, link.id, clickEventName, options.days),
-  countSentCapiByEventName(env, link.id, "Stream_Click", options.days),
-  getMetaDatasetQuality(env)
+const [coreSection, audienceSection, attributionSection, metaSection] = await Promise.all([
+  sectionResult("core", async () => {
+    const [funnel, timeseries, heatmap, uniqueVisitors] = await Promise.all([
+      getFunnelStats(env, link.id, options.days),
+      isHourly ? getHourlyTimeseries(env, link.id, options.hours) : options.unique ? getUniqueTimeseries(env, link.id, options.days) : getLinkTimeseries(env, link.id, options.days),
+      getHourHeatmap(env, link.id, options.days),
+      getUniqueVisitors(env, link.id, options.days)
+    ]);
+    return { funnel, timeseries, heatmap, uniqueVisitors };
+  }),
+  sectionResult("audience", async () => {
+    const [platformClicks, geoRows, cityRows, deviceRows, browserRows, osRows] = await Promise.all([
+      getPlatformClicks(env, link.id), getGeoBreakdown(env, link.id, options.days), getCityBreakdown(env, link.id, options.days),
+      getDeviceBreakdown(env, link.id, options.days), getBrowserBreakdown(env, link.id, options.days), getOsBreakdown(env, link.id, options.days)
+    ]);
+    return { platformClicks, geoRows, cityRows, deviceRows, browserRows, osRows };
+  }),
+  sectionResult("attribution", async () => {
+    const [campaignRows, linkCampaignAttribution, adRows, placementRows, referrerRows, metaAccessToken, metaAdAccountId] = await Promise.all([
+      getCampaignBreakdown(env, link.id, metaDays), getLinkCampaignAttribution(env, link.id, metaDays), getAdBreakdown(env, link.id, metaDays),
+      getPlacementBreakdown(env, link.id, metaDays), getReferrerBreakdown(env, link.id, metaDays), getMetaAccessToken(env), getMetaAdAccountId(env)
+    ]);
+    const metaAdsInsights = metaAdAccountId && metaAccessToken ? await getMetaAdsInsights(env, metaDays, clickEventName) : null;
+    const campaignNameOverrides = await resolveCampaignNames(env, linkCampaignAttribution.map((row) => row.campaignId).filter(Boolean));
+    return { campaignRows, adRows, placementRows, referrerRows, metaAdsInsights, campaignPerformance: buildCampaignPerformance(linkCampaignAttribution, metaAdsInsights, campaignNameOverrides), configured: Boolean(metaAdAccountId && metaAccessToken) };
+  }),
+  sectionResult("meta", async () => {
+    const [pixelId, metaAccessToken, logs, delivery, sentConversions, sentCurrentEvent, sentLegacyEvent, quality] = await Promise.all([
+      getMetaPixelId(env), getMetaAccessToken(env), listCapiLogsByLink(env, link.id, 20, options.days), getCapiDeliveryStats(env, link.id, options.days),
+      countSentCapiConversions(env, link.id, options.days, clickEventName), countSentCapiByEventName(env, link.id, clickEventName, options.days),
+      countSentCapiByEventName(env, link.id, "Stream_Click", options.days), getMetaDatasetQuality(env)
+    ]);
+    return { pixelId, hasAccessToken: Boolean(metaAccessToken), logs, delivery, sentConversions, sentCurrentEvent, sentLegacyEvent, quality };
+  })
 ]);
-const metaAdsInsights = metaAdAccountId && metaAccessToken
-  ? await getMetaAdsInsights(env, metaDays, clickEventName)
-  : null;
-const campaignNameOverrides = await resolveCampaignNames(
-  env,
-  linkCampaignAttribution.map((row) => row.campaignId).filter(Boolean)
-);
-const campaignPerformance = buildCampaignPerformance(linkCampaignAttribution, metaAdsInsights, campaignNameOverrides);
+const core = coreSection.ok ? coreSection.value : null;
+const audience = audienceSection.ok ? audienceSection.value : null;
+const attribution = attributionSection.ok ? attributionSection.value : null;
+const campaignPerformance = attribution?.campaignPerformance ?? [];
 const campaignDisplayRows = campaignPerformance.map((row) => ({
   label: row.displayName,
   count: row.yourTaps,
-  share: funnel.viewContents > 0 ? row.yourTaps / funnel.viewContents : 0
+  share: (core?.funnel.viewContents ?? 0) > 0 ? row.yourTaps / core!.funnel.viewContents : 0
 }));
 const totalAdSpend = campaignPerformance.reduce((sum, row) => sum + (row.spend ?? 0), 0);
-const adsInsightsConfigured = Boolean(metaAdAccountId && metaAccessToken);
-const adsInsightsCurrency = metaAdsInsights?.currency ?? currency;
-const tapRateLabel = funnel.pageViews > 0 ? `${(funnel.tapRate * 100).toFixed(1)}%` : "—";
+const adsInsightsCurrency = attribution?.metaAdsInsights?.currency ?? currency;
+const tapRateLabel = core && core.funnel.pageViews > 0 ? `${(core.funnel.tapRate * 100).toFixed(1)}%` : "—";
 const rangeLabel = isHourly
   ? (options.hours === 168 ? "Last 7 days · hourly" : `Last ${options.hours}h`)
   : `Last ${options.days} days`;
 const uniqueLabel = options.unique ? "unique" : "total";
-const platformTotal = platformClicks.reduce((sum, row) => sum + row.clicks, 0);
-const platformBreakdownRows = platformClicks.map((row) => ({
+const platformTotal = audience?.platformClicks.reduce((sum, row) => sum + row.clicks, 0) ?? 0;
+const platformBreakdownRows = (audience?.platformClicks ?? []).map((row) => ({
   label: platformLabels[row.platform] ?? row.platform,
   count: row.clicks,
   share: platformTotal > 0 ? row.clicks / platformTotal : 0,
   platform: row.platform,
   brandColor: platformBrandColors[row.platform]
 }));
-const geoBreakdownRows = geoRows.map((row) => ({ label: row.country, count: row.count, share: row.share }));
-const hasAttribution = campaignPerformance.length + adRows.length + placementRows.length + referrerRows.length > 0;
-const audienceTabs = [
-  { id: "platforms", label: "Platforms" },
-  { id: "countries", label: "Countries" },
-  { id: "cities", label: "Cities" },
-  { id: "devices", label: "Devices" },
-  { id: "tech", label: "Tech" }
-];
-const attributionTabs = [
-  ...(adsInsightsConfigured ? [{ id: "meta-ads", label: "Meta ads" }] : []),
-  { id: "campaigns", label: "Campaigns" },
-  { id: "ads", label: "Ads" },
-  { id: "placements", label: "Placements" },
-  { id: "referrers", label: "Referrers" }
-];
-const attributionDefaultTab = adsInsightsConfigured ? "meta-ads" : "campaigns";
+const geoBreakdownRows = (audience?.geoRows ?? []).map((row) => ({ label: row.country, count: row.count, share: row.share }));
 
 function formatCurrency(amount: number): string {
   try {
@@ -161,41 +143,6 @@ function formatCurrency(amount: number): string {
 const effectiveMode = effectiveLinkMode(link);
 const days = daysUntilRelease(link.track.release_at);
 const artistLabel = link.track.artist_name || "Unknown artist";
-const pixelConnected = Boolean(pixelId);
-const capiConnected = pixelConnected && Boolean(metaAccessToken);
-const eventsManagerUrl = metaEventsManagerUrl(pixelId);
-const capiMatchKeys = analyzeCapiMatchKeys(linkCapiLogs);
-const clickEventQuality = pickMetaEventQuality(metaQuality, clickEventName);
-const pageViewEventQuality = pickMetaEventQuality(metaQuality, viewEventName);
-const capiDiagnostics = [...(clickEventQuality?.diagnostics ?? []), ...(pageViewEventQuality?.diagnostics ?? [])]
-  .filter((item, index, items) => items.findIndex((other) => other.name === item.name) === index)
-  .slice(0, 4);
-const capiReconcileGap = funnel.viewContents - capiSentConversions;
-const capiReconcileHint = capiReconcileGap === 0
-  ? "Matches tap count"
-  : capiReconcileGap > 0
-    ? `${capiReconcileGap} tap(s) missing from CAPI log`
-    : `${Math.abs(capiReconcileGap)} extra CAPI row(s)`;
-const capiConversionDetail = capiSentLegacyStreamClick > 0
-  ? `${capiSentViewContent} ${clickEventName} · ${capiSentLegacyStreamClick} legacy Stream_Click`
-  : `${capiSentViewContent} ${clickEventName}`;
-const matchKeyRows = [
-  ["IP", capiMatchKeys.ip],
-  ["UA", capiMatchKeys.userAgent],
-  ["fbp", capiMatchKeys.fbp],
-  ["fbc", capiMatchKeys.fbc],
-  ["Ext ID", capiMatchKeys.externalId],
-  ["Country", capiMatchKeys.country],
-  ["City", capiMatchKeys.city],
-  ["State", capiMatchKeys.state],
-  ["ZIP", capiMatchKeys.zip],
-  ["Email", capiMatchKeys.email]
-] as const;
-const metaFeedbackById = new Map(
-  (clickEventQuality?.matchKeyFeedback ?? []).map((item) => [formatMatchKeyLabel(item.identifier), item.percentage])
-);
-const showMatchKeysOpen = capiDelivery.failed > 0 || (clickEventQuality?.emqScore ?? 10) < 7;
-const showDiagnosticsOpen = capiDiagnostics.some((item) => (item.percentage ?? 0) > 5);
 const artworkSrc = artworkPublicPath(link.track);
 const modeBadge = effectiveMode === "presave"
   ? { label: `Pre-save${days !== null ? ` · ${days}d` : ""}`, variant: "presave" }
@@ -215,15 +162,6 @@ function hrefWith(overrides: Record<string, string>, removes: string[] = []): st
   return `?${params.toString()}`;
 }
 
-function matchKeyShare(count: number, total: number): string {
-  if (total <= 0) return "—";
-  return `${Math.round((count / total) * 100)}%`;
-}
-
-function emqLabel(score: number | undefined): string {
-  if (score === undefined) return "—";
-  return `${score.toFixed(1)}/10`;
-}
 ---
 
 <AppLayout title={link.link_name}>
@@ -268,17 +206,18 @@ function emqLabel(score: number | undefined): string {
       </section>
     )}
 
+    {core ? (<>
     <section class="admin-panel analytics-panel" aria-label="Analytics">
       <div class="metric-strip bare funnel-strip" aria-label="Funnel">
         <div class="metric">
           <span class="label">Page views</span>
-          <span class="value accent">{funnel.pageViews}</span>
+          <span class="value accent">{core.funnel.pageViews}</span>
           <span class="sub muted">{rangeLabel} · {uniqueLabel}</span>
         </div>
         <div class="funnel-arrow" aria-hidden="true">→</div>
         <div class="metric">
           <span class="label">Stream taps</span>
-          <span class="value success">{funnel.viewContents}</span>
+          <span class="value success">{core.funnel.viewContents}</span>
           <span class="sub muted">
             {totalAdSpend > 0
               ? `Ad spend ${formatCurrency(totalAdSpend)}`
@@ -292,7 +231,7 @@ function emqLabel(score: number | undefined): string {
         </div>
         <div class="metric">
           <span class="label">Unique visitors</span>
-          <span class="value">{uniqueVisitors}</span>
+          <span class="value">{core.uniqueVisitors}</span>
           <span class="sub muted">Deduped people</span>
         </div>
       </div>
@@ -331,7 +270,7 @@ function emqLabel(score: number | undefined): string {
         </div>
       </div>
       <Chart
-        series={timeseries}
+        series={core.timeseries}
         labelFormat={isHourly ? "hour" : "day"}
         viewsLabel="Page views"
         clicksLabel="Stream taps"
@@ -341,211 +280,30 @@ function emqLabel(score: number | undefined): string {
     </section>
 
     <CollapsibleSection id="peak-hours" title="Peak hours" subtitle={`ViewContent taps · ${rangeLabel} · UTC`} defaultOpen={true}>
-      <HourHeatmap data={heatmap} ariaLabel={`Taps by hour and weekday for ${link.link_name}`} />
+      <HourHeatmap data={core.heatmap} ariaLabel={`Taps by hour and weekday for ${link.link_name}`} />
     </CollapsibleSection>
+    </>) : (
+      <section class="admin-panel section-unavailable" role="status"><h2>Analytics unavailable</h2><p class="muted">{coreSection.ok ? "Analytics data is temporarily unavailable." : coreSection.message}</p></section>
+    )}
 
-    <CollapsibleSection id="audience" title="Audience" subtitle={rangeLabel} defaultOpen={true}>
-      <AnalyticsTabs groupId="audience" tabs={audienceTabs} activeId="platforms">
-        <div data-tab-panel="platforms" id="audience-panel-platforms" role="tabpanel" aria-labelledby="audience-tab-platforms">
-          <BreakdownList rows={platformBreakdownRows} empty="No platform clicks yet." />
-        </div>
-        <div data-tab-panel="countries" id="audience-panel-countries" role="tabpanel" hidden aria-labelledby="audience-tab-countries">
-          <BreakdownList rows={geoBreakdownRows} empty="No country data yet." />
-        </div>
-        <div data-tab-panel="cities" id="audience-panel-cities" role="tabpanel" hidden aria-labelledby="audience-tab-cities">
-          <BreakdownList rows={cityRows} empty="No city data yet." />
-        </div>
-        <div data-tab-panel="devices" id="audience-panel-devices" role="tabpanel" hidden aria-labelledby="audience-tab-devices">
-          <BreakdownList rows={deviceRows} empty="No device data yet." />
-        </div>
-        <div data-tab-panel="tech" id="audience-panel-tech" role="tabpanel" hidden aria-labelledby="audience-tab-tech">
-          <div class="tech-split">
-            <div class="tech-block">
-              <h3 class="tech-title">Browsers</h3>
-              <BreakdownList rows={browserRows} empty="No browser data yet." limit={5} />
-            </div>
-            <div class="tech-block">
-              <h3 class="tech-title">Operating systems</h3>
-              <BreakdownList rows={osRows} empty="No OS data yet." limit={5} />
-            </div>
-          </div>
-        </div>
-      </AnalyticsTabs>
-    </CollapsibleSection>
+    {audience ? (
+      <AnalyticsAudience rangeLabel={rangeLabel} platformRows={platformBreakdownRows} countryRows={geoBreakdownRows} cityRows={audience.cityRows} deviceRows={audience.deviceRows} browserRows={audience.browserRows} osRows={audience.osRows} />
+    ) : (
+      <CollapsibleSection id="audience" title="Audience" subtitle="Temporarily unavailable" defaultOpen={true}><p class="muted empty-line">{audienceSection.ok ? "Analytics data is temporarily unavailable." : audienceSection.message}</p></CollapsibleSection>
+    )}
 
-    <CollapsibleSection id="attribution" title="Attribution" subtitle={`Where ViewContent comes from · ${rangeLabel}`} defaultOpen={hasAttribution || adsInsightsConfigured}>
-      {hasAttribution || adsInsightsConfigured ? (
-        <AnalyticsTabs groupId="attribution" tabs={attributionTabs} activeId={attributionDefaultTab}>
-          {adsInsightsConfigured && (
-            <div data-tab-panel="meta-ads" id="attribution-panel-meta-ads" role="tabpanel" aria-labelledby="attribution-tab-meta-ads">
-              <MetaCampaignTable
-                rows={campaignPerformance}
-                currency={adsInsightsCurrency}
-                error={metaAdsInsights?.error}
-                fetchedAt={metaAdsInsights?.fetchedAt}
-                empty="No campaign taps on this link in range. Add campaign_id={{campaign.id}} to your ad URL."
-              />
-              <p class="attribution-hint muted">
-                Spend and results from Meta Ads API · your taps from first-party logs. Token needs <code>ads_read</code> and <code>read_insights</code>.
-              </p>
-            </div>
-          )}
-          <div data-tab-panel="campaigns" id="attribution-panel-campaigns" role="tabpanel" hidden={attributionDefaultTab !== "campaigns"} aria-labelledby="attribution-tab-campaigns">
-            <BreakdownList rows={campaignDisplayRows.length > 0 ? campaignDisplayRows : campaignRows} empty="No campaign data yet." sensitive />
-            <p class="attribution-hint muted">
-              Use <code>campaign_id={"{{campaign.id}}"}</code> and <code>utm_campaign={"{{campaign.name}}"}</code> on your ad URL for names + Meta join.
-            </p>
-          </div>
-          <div data-tab-panel="ads" id="attribution-panel-ads" role="tabpanel" hidden aria-labelledby="attribution-tab-ads">
-            <BreakdownList rows={adRows} empty="No ad data yet." sensitive />
-            <p class="attribution-hint muted">Add <code>ad_id={"{{ad.id}}"}</code> to your ad URL.</p>
-          </div>
-          <div data-tab-panel="placements" id="attribution-panel-placements" role="tabpanel" hidden aria-labelledby="attribution-tab-placements">
-            <BreakdownList rows={placementRows} empty="No placement data yet." sensitive />
-            <p class="attribution-hint muted">Add <code>placement={"{{placement}}"}</code> to your ad URL.</p>
-          </div>
-          <div data-tab-panel="referrers" id="attribution-panel-referrers" role="tabpanel" hidden aria-labelledby="attribution-tab-referrers">
-            <BreakdownList rows={referrerRows} empty="No referrer data yet." />
-            <p class="attribution-hint muted">Where the tap came from before your link page.</p>
-          </div>
-        </AnalyticsTabs>
-      ) : (
-        <p class="muted empty-line">No campaign, ad, or referrer data yet. Add URL parameters to your ads (e.g. <code>utm_campaign</code>, <code>ad_id={"{{ad.id}}"}</code>, <code>placement={"{{placement}}"}</code>) so this fills in.</p>
-      )}
-    </CollapsibleSection>
+    {attribution ? (
+      <AnalyticsAttribution rangeLabel={rangeLabel} configured={attribution.configured} campaignPerformance={campaignPerformance} currency={adsInsightsCurrency} metaError={attribution.metaAdsInsights?.error} metaFetchedAt={attribution.metaAdsInsights?.fetchedAt} campaignRows={campaignDisplayRows.length > 0 ? campaignDisplayRows : attribution.campaignRows} adRows={attribution.adRows} placementRows={attribution.placementRows} referrerRows={attribution.referrerRows} />
+    ) : (
+      <CollapsibleSection id="attribution" title="Attribution" subtitle="Temporarily unavailable" defaultOpen={false}><p class="muted empty-line">{attributionSection.ok ? "Analytics data is temporarily unavailable." : attributionSection.message}</p></CollapsibleSection>
+    )}
 
-    <CollapsibleSection id="meta-delivery" title="Meta delivery & quality" subtitle={`${rangeLabel} · CAPI logs + dataset quality`} defaultOpen={capiConnected}>
-      <div class="panel-head tracking-head">
-        <div class="tracking-actions">
-          <ScreenshotSafeToggle id="screenshotSafeModeOverview" compact />
-          {eventsManagerUrl && (
-            <Button variant="ghost" size="sm" href={eventsManagerUrl} target="_blank" rel="noreferrer" data-sensitive>
-              Events Manager
-            </Button>
-          )}
-          <Button class="icon-only" variant="ghost" size="sm" href="/admin/settings" data-settings-open aria-haspopup="dialog" title="Tracking settings" aria-label="Open tracking settings"><Icon name="settings" /></Button>
-        </div>
-      </div>
+    {metaSection.ok ? (
+      <AnalyticsMetaDelivery rangeLabel={rangeLabel} pixelId={metaSection.value.pixelId} hasAccessToken={metaSection.value.hasAccessToken} logs={metaSection.value.logs} delivery={metaSection.value.delivery} sentConversions={metaSection.value.sentConversions} sentCurrentEvent={metaSection.value.sentCurrentEvent} sentLegacyEvent={metaSection.value.sentLegacyEvent} trackedTaps={core?.funnel.viewContents ?? 0} clickEventName={clickEventName} viewEventName={viewEventName} quality={metaSection.value.quality} />
+    ) : (
+      <CollapsibleSection id="meta-delivery" title="Meta delivery & quality" subtitle="Temporarily unavailable" defaultOpen={false}><p class="muted empty-line">{metaSection.message}</p></CollapsibleSection>
+    )}
 
-      <div class={`tracking-status ${capiConnected ? "ok" : pixelConnected ? "warn" : "muted"}`}>
-        <span class="dot" aria-hidden="true"></span>
-        <p>
-          {capiConnected
-            ? "CAPI connected. Server events below mirror what was queued for Meta."
-            : pixelConnected
-              ? "Pixel set, token missing. Browser PageView may still fire; CAPI is paused."
-              : "Not connected. First-party analytics only."}
-        </p>
-      </div>
-
-      {capiConnected && (
-        <div class="meta-delivery-strip">
-          <div class="metric">
-            <span class="label">CAPI sent</span>
-            <span class="value success">{capiDelivery.sent}</span>
-            <span class="sub muted">{capiDelivery.total > 0 ? `${(capiDelivery.successRate * 100).toFixed(0)}% success` : "No sends"}</span>
-          </div>
-          <div class="metric">
-            <span class="label">CAPI failed</span>
-            <span class={`value ${capiDelivery.failed > 0 ? "warn-text" : ""}`}>{capiDelivery.failed}</span>
-            <span class="sub muted">{capiDelivery.retried > 0 ? `${capiDelivery.retried} retried` : "Retries every 15 min"}</span>
-          </div>
-          <div class="metric">
-            <span class="label">CAPI conversions</span>
-            <span class="value">{capiSentConversions}</span>
-            <span class={`sub ${Math.abs(capiReconcileGap) > 0 ? "warn-text" : "muted"}`}>{capiReconcileHint}</span>
-            <span class="sub muted">{capiConversionDetail}</span>
-          </div>
-          <div class="metric">
-            <span class="label">EMQ · {clickEventName}</span>
-            <span class="value">{emqLabel(clickEventQuality?.emqScore)}</span>
-            <span class="sub muted">
-              {clickEventQuality?.eventCoverage !== undefined
-                ? `${clickEventQuality.eventCoverage.toFixed(0)}% pixel · ${viewEventName} ${emqLabel(pageViewEventQuality?.emqScore)}`
-                : `PageView ${emqLabel(pageViewEventQuality?.emqScore)}`}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {capiConnected && capiMatchKeys.total > 0 && (
-        <details class="meta-details" open={showMatchKeysOpen}>
-          <summary class="meta-details-summary">Match key coverage</summary>
-          <p class="muted meta-panel-copy">Your sent payloads vs Meta dataset-wide coverage. Enable Cloudflare → Rules → Managed transforms → <strong>Add visitor location headers</strong> for better geo.</p>
-          <div class="admin-table-wrap">
-            <table class="admin-table match-key-table">
-              <thead>
-                <tr><th>Identifier</th><th>Your sends</th><th>Meta dataset</th></tr>
-              </thead>
-              <tbody>
-                {matchKeyRows.map(([label, count]) => (
-                  <tr>
-                    <td>{label}</td>
-                    <td class="tabular-nums">{matchKeyShare(Number(count), capiMatchKeys.total)}</td>
-                    <td class="tabular-nums">{metaFeedbackById.has(label) ? `${metaFeedbackById.get(label)!.toFixed(0)}%` : "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </details>
-      )}
-
-      {capiConnected && capiDiagnostics.length > 0 && (
-        <details class="meta-details" open={showDiagnosticsOpen}>
-          <summary class="meta-details-summary">Meta diagnostics</summary>
-          {capiDiagnostics.map((item) => (
-            <div class="diagnostic-row">
-              <strong>{item.name}</strong>
-              <p class="muted">{item.description}</p>
-              {item.solution && <p class="diagnostic-solution">{item.solution}</p>}
-            </div>
-          ))}
-        </details>
-      )}
-
-      {capiConnected && metaQuality?.error && (
-        <p class="muted empty-line">Could not load Meta dataset quality: {metaQuality.error}</p>
-      )}
-
-      {linkCapiLogs.length > 0 ? (
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead>
-              <tr><th>Time</th><th>Event</th><th>Platform</th><th>Match keys</th><th>Status</th><th>Detail</th></tr>
-            </thead>
-            <tbody>
-              {linkCapiLogs.map((row) => {
-                const view = parseCapiLogView(row);
-                return (
-                  <tr>
-                    <td class="tabular-nums">{row.created_at.slice(0, 19)}</td>
-                    <td>
-                      <div class="event-cell">
-                        <span>{view.eventName}</span>
-                        {view.attribution && <span class="muted event-sub" data-sensitive>{view.attribution}</span>}
-                      </div>
-                    </td>
-                    <td>{view.platform ?? "—"}</td>
-                    <td>
-                      <div class="match-badges">
-                        {view.matchKeys.length > 0
-                          ? view.matchKeys.map((key) => <span class="match-badge">{key}</span>)
-                          : <span class="muted">—</span>}
-                      </div>
-                    </td>
-                    <td class={row.status}>{row.status}</td>
-                    <td class="detail-cell" data-sensitive>{row.error_message ?? row.meta_trace_id ?? row.http_status ?? "—"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      ) : capiConnected ? (
-        <p class="muted empty-line">No CAPI log rows for this link in {rangeLabel.toLowerCase()}. Traffic may be pre-deploy or bots were filtered.</p>
-      ) : null}
-    </CollapsibleSection>
 
     <SubscriberManager linkId={link.id} subscribers={subscribers} />
 

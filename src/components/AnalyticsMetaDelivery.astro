@@ -1,0 +1,119 @@
+---
+import Button from "@components/Button.astro";
+import CollapsibleSection from "@components/CollapsibleSection.astro";
+import Icon from "@components/Icon.astro";
+import ScreenshotSafeToggle from "@components/ScreenshotSafeToggle.astro";
+import { analyzeCapiMatchKeys, parseCapiLogView, type CapiDeliveryStats, type CapiLogRow } from "@lib/capi-log";
+import { formatMatchKeyLabel, pickMetaEventQuality, type MetaDatasetQuality } from "@lib/meta-quality";
+import { metaEventsManagerUrl } from "@lib/settings";
+
+interface Props {
+  rangeLabel: string;
+  pixelId?: string;
+  hasAccessToken: boolean;
+  logs: CapiLogRow[];
+  delivery: CapiDeliveryStats;
+  sentConversions: number;
+  sentCurrentEvent: number;
+  sentLegacyEvent: number;
+  trackedTaps: number;
+  clickEventName: string;
+  viewEventName: string;
+  quality: MetaDatasetQuality | null;
+}
+
+const { rangeLabel, pixelId, hasAccessToken, logs, delivery, sentConversions, sentCurrentEvent, sentLegacyEvent, trackedTaps, clickEventName, viewEventName, quality } = Astro.props;
+const pixelConnected = Boolean(pixelId);
+const capiConnected = pixelConnected && hasAccessToken;
+const eventsManagerUrl = metaEventsManagerUrl(pixelId);
+const matchKeys = analyzeCapiMatchKeys(logs);
+const clickQuality = pickMetaEventQuality(quality, clickEventName);
+const viewQuality = pickMetaEventQuality(quality, viewEventName);
+const diagnostics = [...(clickQuality?.diagnostics ?? []), ...(viewQuality?.diagnostics ?? [])]
+  .filter((item, index, items) => items.findIndex((other) => other.name === item.name) === index)
+  .slice(0, 4);
+const reconcileGap = trackedTaps - sentConversions;
+const reconcileHint = reconcileGap === 0 ? "Matches tap count" : reconcileGap > 0 ? `${reconcileGap} tap(s) missing from CAPI log` : `${Math.abs(reconcileGap)} extra CAPI row(s)`;
+const conversionDetail = sentLegacyEvent > 0 ? `${sentCurrentEvent} ${clickEventName} · ${sentLegacyEvent} legacy Stream_Click` : `${sentCurrentEvent} ${clickEventName}`;
+const matchKeyRows = [["IP", matchKeys.ip], ["UA", matchKeys.userAgent], ["fbp", matchKeys.fbp], ["fbc", matchKeys.fbc], ["Ext ID", matchKeys.externalId], ["Country", matchKeys.country], ["City", matchKeys.city], ["State", matchKeys.state], ["ZIP", matchKeys.zip], ["Email", matchKeys.email]] as const;
+const feedback = new Map((clickQuality?.matchKeyFeedback ?? []).map((item) => [formatMatchKeyLabel(item.identifier), item.percentage]));
+const showMatchKeysOpen = delivery.failed > 0 || (clickQuality?.emqScore ?? 10) < 7;
+const showDiagnosticsOpen = diagnostics.some((item) => (item.percentage ?? 0) > 5);
+const share = (count: number) => matchKeys.total > 0 ? `${Math.round((count / matchKeys.total) * 100)}%` : "—";
+const emq = (score?: number) => score === undefined ? "—" : `${score.toFixed(1)}/10`;
+---
+
+<CollapsibleSection id="meta-delivery" title="Meta delivery & quality" subtitle={`${rangeLabel} · CAPI logs + dataset quality`} defaultOpen={capiConnected}>
+  <div class="tracking-actions">
+    <ScreenshotSafeToggle id="screenshotSafeModeOverview" compact />
+    {eventsManagerUrl && <Button variant="ghost" size="sm" href={eventsManagerUrl} target="_blank" rel="noreferrer" data-sensitive>Events Manager</Button>}
+    <Button class="icon-only" variant="ghost" size="sm" href="/admin/settings" data-settings-open aria-haspopup="dialog" title="Tracking settings" aria-label="Open tracking settings"><Icon name="settings" /></Button>
+  </div>
+
+  <div class:list={["tracking-status", capiConnected ? "ok" : pixelConnected ? "warn" : "muted"]}>
+    <span class="dot" aria-hidden="true"></span>
+    <p>{capiConnected ? "CAPI connected. Server events below mirror what was queued for Meta." : pixelConnected ? "Pixel set, token missing. Browser PageView may still fire; CAPI is paused." : "Not connected. First-party analytics only."}</p>
+  </div>
+
+  {capiConnected && (
+    <div class="delivery-strip">
+      <div class="metric"><span class="label">CAPI sent</span><span class="value success">{delivery.sent}</span><span class="sub muted">{delivery.total > 0 ? `${(delivery.successRate * 100).toFixed(0)}% success` : "No sends"}</span></div>
+      <div class="metric"><span class="label">CAPI failed</span><span class:list={["value", delivery.failed > 0 && "warn-text"]}>{delivery.failed}</span><span class="sub muted">{delivery.retried > 0 ? `${delivery.retried} retried` : "Retries every 15 min"}</span></div>
+      <div class="metric"><span class="label">CAPI conversions</span><span class="value">{sentConversions}</span><span class:list={["sub", Math.abs(reconcileGap) > 0 ? "warn-text" : "muted"]}>{reconcileHint}</span><span class="sub muted">{conversionDetail}</span></div>
+      <div class="metric"><span class="label">EMQ · {clickEventName}</span><span class="value">{emq(clickQuality?.emqScore)}</span><span class="sub muted">{clickQuality?.eventCoverage !== undefined ? `${clickQuality.eventCoverage.toFixed(0)}% pixel · ${viewEventName} ${emq(viewQuality?.emqScore)}` : `PageView ${emq(viewQuality?.emqScore)}`}</span></div>
+    </div>
+  )}
+
+  {capiConnected && matchKeys.total > 0 && (
+    <details open={showMatchKeysOpen}>
+      <summary>Match key coverage</summary>
+      <p class="muted panel-copy">Your sent payloads vs Meta dataset-wide coverage. Enable Cloudflare → Rules → Managed transforms → <strong>Add visitor location headers</strong> for better geo.</p>
+      <div class="admin-table-wrap"><table class="admin-table match-key-table"><thead><tr><th>Identifier</th><th>Your sends</th><th>Meta dataset</th></tr></thead><tbody>{matchKeyRows.map(([label, count]) => <tr><td>{label}</td><td class="tabular-nums">{share(Number(count))}</td><td class="tabular-nums">{feedback.has(label) ? `${feedback.get(label)!.toFixed(0)}%` : "—"}</td></tr>)}</tbody></table></div>
+    </details>
+  )}
+
+  {capiConnected && diagnostics.length > 0 && (
+    <details open={showDiagnosticsOpen}>
+      <summary>Meta diagnostics</summary>
+      {diagnostics.map((item) => <div class="diagnostic-row"><strong>{item.name}</strong><p class="muted">{item.description}</p>{item.solution && <p class="solution">{item.solution}</p>}</div>)}
+    </details>
+  )}
+
+  {capiConnected && quality?.error && <p class="muted empty-line">Could not load Meta dataset quality: {quality.error}</p>}
+
+  {logs.length > 0 ? (
+    <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Time</th><th>Event</th><th>Platform</th><th>Match keys</th><th>Status</th><th>Detail</th></tr></thead><tbody>{logs.map((row) => { const view = parseCapiLogView(row); return <tr><td class="tabular-nums">{row.created_at.slice(0, 19)}</td><td><div class="event-cell"><span>{view.eventName}</span>{view.attribution && <span class="muted event-sub" data-sensitive>{view.attribution}</span>}</div></td><td>{view.platform ?? "—"}</td><td><div class="match-badges">{view.matchKeys.length > 0 ? view.matchKeys.map((key) => <span class="match-badge">{key}</span>) : <span class="muted">—</span>}</div></td><td class={row.status}>{row.status}</td><td class="detail-cell" data-sensitive>{row.error_message ?? row.meta_trace_id ?? row.http_status ?? "—"}</td></tr>; })}</tbody></table></div>
+  ) : capiConnected ? <p class="muted empty-line">No CAPI log rows for this link in {rangeLabel.toLowerCase()}. Traffic may be pre-deploy or bots were filtered.</p> : null}
+</CollapsibleSection>
+
+<style>
+  .tracking-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
+  .delivery-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; background: color-mix(in srgb, var(--surface) 92%, transparent); }
+  .delivery-strip .metric { padding: 0.75rem 0.9rem; border-inline-start: 1px solid var(--border); border-radius: 0; background: transparent; box-shadow: none; }
+  .delivery-strip .metric:first-child { border-inline-start: 0; }
+  .delivery-strip .value { font-size: var(--text-xl); }
+  .delivery-strip .success { color: var(--success); }
+  .sub { display: block; margin-top: 0.2rem; font-size: var(--text-xs); line-height: 1.35; }
+  .warn-text { color: var(--warn); }
+  details { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.65rem 0.9rem; background: color-mix(in srgb, var(--surface) 94%, transparent); }
+  summary { cursor: pointer; font-size: var(--text-sm); font-weight: 600; color: var(--foreground); list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  details[open] summary { margin-bottom: 0.55rem; }
+  .panel-copy { margin: 0 0 0.55rem; font-size: var(--text-xs); }
+  .match-key-table th:not(:first-child), .match-key-table td:not(:first-child) { text-align: right; }
+  .diagnostic-row + .diagnostic-row { padding-top: 0.65rem; border-top: 1px solid var(--border); }
+  .diagnostic-row strong { display: block; font-size: var(--text-sm); margin-bottom: 0.2rem; }
+  .diagnostic-row p { margin: 0; font-size: var(--text-xs); line-height: 1.45; }
+  .solution { margin-top: 0.25rem !important; color: var(--foreground); }
+  .event-cell { display: grid; gap: 0.1rem; }
+  .event-sub { font-size: var(--text-xs); }
+  .match-badges { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+  .match-badge { display: inline-flex; padding: 0.1rem 0.35rem; border-radius: 999px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--foreground); font-size: 0.68rem; letter-spacing: 0.02em; }
+  .detail-cell { max-width: 16rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .empty-line { margin: 0; padding: 0.6rem 0; font-size: var(--text-sm); }
+  @media (max-width: 720px) {
+    .delivery-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .delivery-strip .metric:nth-child(odd) { border-inline-start: 0; }
+    .delivery-strip .metric:nth-child(n + 3) { border-top: 1px solid var(--border); }
+  }
+</style>

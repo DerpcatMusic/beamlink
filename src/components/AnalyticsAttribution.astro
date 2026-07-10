@@ -1,0 +1,67 @@
+---
+import AnalyticsTabs from "@components/AnalyticsTabs.astro";
+import BreakdownList, { type BreakdownRow } from "@components/BreakdownList.astro";
+import CollapsibleSection from "@components/CollapsibleSection.astro";
+import MetaCampaignTable from "@components/MetaCampaignTable.astro";
+import type { CampaignPerformanceRow } from "@lib/meta-ads-insights";
+
+interface Props {
+  rangeLabel: string;
+  configured: boolean;
+  campaignPerformance: CampaignPerformanceRow[];
+  currency: string;
+  metaError?: string | null;
+  metaFetchedAt?: string;
+  campaignRows: BreakdownRow[];
+  adRows: BreakdownRow[];
+  placementRows: BreakdownRow[];
+  referrerRows: BreakdownRow[];
+}
+
+const { rangeLabel, configured, campaignPerformance, currency, metaError, metaFetchedAt, campaignRows, adRows, placementRows, referrerRows } = Astro.props;
+const hasAttribution = campaignPerformance.length + adRows.length + placementRows.length + referrerRows.length > 0;
+const tabs = [
+  ...(configured ? [{ id: "meta-ads", label: "Meta ads" }] : []),
+  { id: "campaigns", label: "Campaigns" },
+  { id: "ads", label: "Ads" },
+  { id: "placements", label: "Placements" },
+  { id: "referrers", label: "Referrers" }
+];
+const defaultTab = configured ? "meta-ads" : "campaigns";
+---
+
+<CollapsibleSection id="attribution" title="Attribution" subtitle={`Where ViewContent comes from · ${rangeLabel}`} defaultOpen={hasAttribution || configured}>
+  {hasAttribution || configured ? (
+    <AnalyticsTabs groupId="attribution" tabs={tabs} activeId={defaultTab}>
+      {configured && (
+        <div data-tab-panel="meta-ads" id="attribution-panel-meta-ads" role="tabpanel" aria-labelledby="attribution-tab-meta-ads">
+          <MetaCampaignTable rows={campaignPerformance} currency={currency} error={metaError} fetchedAt={metaFetchedAt} empty="No campaign taps on this link in range. Add campaign_id={{campaign.id}} to your ad URL." />
+          <p class="hint muted">Spend and results from Meta Ads API · your taps from first-party logs. Token needs <code>ads_read</code> and <code>read_insights</code>.</p>
+        </div>
+      )}
+      <div data-tab-panel="campaigns" id="attribution-panel-campaigns" role="tabpanel" hidden={defaultTab !== "campaigns"} aria-labelledby="attribution-tab-campaigns">
+        <BreakdownList rows={campaignRows} empty="No campaign data yet." sensitive />
+        <p class="hint muted">Use <code>campaign_id={"{{campaign.id}}"}</code> and <code>utm_campaign={"{{campaign.name}}"}</code> on your ad URL for names + Meta join.</p>
+      </div>
+      <div data-tab-panel="ads" id="attribution-panel-ads" role="tabpanel" hidden aria-labelledby="attribution-tab-ads">
+        <BreakdownList rows={adRows} empty="No ad data yet." sensitive />
+        <p class="hint muted">Add <code>ad_id={"{{ad.id}}"}</code> to your ad URL.</p>
+      </div>
+      <div data-tab-panel="placements" id="attribution-panel-placements" role="tabpanel" hidden aria-labelledby="attribution-tab-placements">
+        <BreakdownList rows={placementRows} empty="No placement data yet." sensitive />
+        <p class="hint muted">Add <code>placement={"{{placement}}"}</code> to your ad URL.</p>
+      </div>
+      <div data-tab-panel="referrers" id="attribution-panel-referrers" role="tabpanel" hidden aria-labelledby="attribution-tab-referrers">
+        <BreakdownList rows={referrerRows} empty="No referrer data yet." />
+        <p class="hint muted">Where the tap came from before your link page.</p>
+      </div>
+    </AnalyticsTabs>
+  ) : (
+    <p class="muted empty-line">No campaign, ad, or referrer data yet. Add URL parameters to your ads (e.g. <code>utm_campaign</code>, <code>ad_id={"{{ad.id}}"}</code>, <code>placement={"{{placement}}"}</code>) so this fills in.</p>
+  )}
+</CollapsibleSection>
+
+<style>
+  .hint { margin: 0.5rem 0 0; font-size: var(--text-xs); }
+  .empty-line { margin: 0; padding: 0.6rem 0; font-size: var(--text-sm); }
+</style>
