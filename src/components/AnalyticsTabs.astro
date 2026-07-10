@@ -120,4 +120,8 @@ const { groupId, tabs, activeId } = Astro.props;
     outline: var(--focus-ring);
     outline-offset: 1px;
   }
+
+  @media (max-width: 720px), (pointer: coarse) {
+    .tab-chip { min-height: 2.75rem; }
+  }
 </style>

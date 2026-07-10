@@ -27,13 +27,6 @@ const pageTitle = /^Beamlink\s[—-]\s/.test(title)
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-    />
-
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
@@ -43,15 +36,6 @@ const pageTitle = /^Beamlink\s[—-]\s/.test(title)
   </head>
   <body>
     <div class="marketing">
-      <div class="m-backdrop" aria-hidden="true">
-        <div class="m-aurora">
-          <span class="m-aurora-blob m-aurora-blob--1"></span>
-          <span class="m-aurora-blob m-aurora-blob--2"></span>
-          <span class="m-aurora-blob m-aurora-blob--3"></span>
-          <span class="m-aurora-blob m-aurora-blob--4"></span>
-        </div>
-        <div class="m-vignette"></div>
-      </div>
       <slot />
     </div>
     <script is:inline>
@@ -62,28 +46,6 @@ const pageTitle = /^Beamlink\s[—-]\s/.test(title)
         window.addEventListener("scroll", onScroll, { passive: true });
 
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-        // Parallax: aurora and dot grid drift slower than the page.
-        const aurora = document.querySelector(".m-aurora");
-        if (aurora) {
-          let ticking = false;
-          const onParallax = () => {
-            const y = window.scrollY;
-            if (aurora) aurora.style.transform = `translate3d(0, ${y * 0.28}px, 0)`;
-            ticking = false;
-          };
-          onParallax();
-          window.addEventListener(
-            "scroll",
-            () => {
-              if (!ticking) {
-                requestAnimationFrame(onParallax);
-                ticking = true;
-              }
-            },
-            { passive: true }
-          );
-        }
 
         const items = document.querySelectorAll("[data-reveal]");
         if (!items.length) return;
