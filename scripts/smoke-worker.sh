@@ -35,7 +35,7 @@ for route in / /admin/onboarding /admin/links/new; do
   curl --fail --silent --show-error --output /dev/null "${BASE_URL}${route}"
 done
 
-curl --fail --silent --show-error "${BASE_URL}/" | rg --quiet '<html|<!doctype html'
+curl --fail --silent --show-error "${BASE_URL}/" | grep -Eqi '<html|<!doctype html'
 
 assert_max_bytes() {
   local label="$1"
@@ -56,6 +56,6 @@ assert_max_bytes() {
 assert_max_bytes "fan page" 30000 "${BASE_URL}/demon-cake"
 assert_max_bytes "new-link editor" 100000 "${BASE_URL}/admin/links/new"
 assert_max_bytes "ASCII preview" 40000 -X POST -H 'content-type: application/json' --data '{"title":"Payload check","artistName":"Linkbeam","pageBackgroundStyle":"ascii","destinations":{"spotify":"https://open.spotify.com/track/1"}}' "${BASE_URL}/admin/preview"
-rg --quiet 'queue|scheduled' dist/server/entry.mjs dist/server/chunks 2>/dev/null
+grep -ERq 'queue|scheduled' dist/server/entry.mjs dist/server/chunks 2>/dev/null
 
 echo "Built Worker smoke test passed at ${BASE_URL}"
