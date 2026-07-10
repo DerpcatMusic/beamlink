@@ -10,10 +10,11 @@ import { resolve } from "node:path";
 
 const globalCss = readFileSync(resolve(import.meta.dirname, "../src/styles/global.css"), "utf8");
 const repoRoot = resolve(import.meta.dirname, "..");
+const isDeploymentFork = wrangler.includes("links.dolmengatemedia.com");
 
 function staleBrandMatches(): string[] {
   const matches: string[] = [];
-  const allowed = /(?:--beamlink-|\.beamlink-|Legacy Beamlink|sync-from-beamlink\.sh|BEAMLINK_DIR)/i;
+  const allowed = /(?:--beamlink-|\.beamlink-|Legacy Beamlink|sync-from-beamlink\.sh|BEAMLINK_DIR|projects\/beamlink|\.\.\/beamlink)/i;
   const visit = (relative: string) => {
     for (const entry of readdirSync(resolve(repoRoot, relative), { withFileTypes: true })) {
       const next = `${relative}/${entry.name}`;
@@ -74,9 +75,10 @@ describe("project cleanup", () => {
     expect(staleBrandMatches()).toEqual([]);
   });
 
-  it("uses Linkbeam defaults for new installs", () => {
-    expect(wrangler).toContain('"name": "linkbeam"');
-    expect(wrangler).toContain('"bucket_name": "linkbeam-artwork"');
-    expect(wrangler).toContain('"queue": "linkbeam-conversions"');
+  it("uses Linkbeam defaults while preserving deployment-fork resources", () => {
+    const expectedPrefix = isDeploymentFork ? "music-shortlink" : "linkbeam";
+    expect(wrangler).toContain(`"name": "${expectedPrefix}"`);
+    expect(wrangler).toContain(`"bucket_name": "${expectedPrefix}-artwork"`);
+    expect(wrangler).toContain(`"queue": "${expectedPrefix}-conversions"`);
   });
 });
