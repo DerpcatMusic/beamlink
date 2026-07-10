@@ -163,7 +163,7 @@ const empty = series.length === 0;
         ["Tap rate", formatTapRate(marker.tapRate)]
       ];
       if (marker.presaves > 0) {
-        rows.push(["Pre-saves", String(marker.presaves)]);
+        rows.push(["Pre-release taps", String(marker.presaves)]);
       }
       if (showDelta) {
         const viewDelta = formatDelta(marker.deltaViews, marker.priorViews);

@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { effectiveDraftMode, resolvePreviewDraft, type PreviewDraft } from "../src/lib/preview-draft";
+import { preReleaseDestinationLabel } from "../src/lib/effective-mode";
 
 describe("preview-draft", () => {
+  it("uses truthful pre-release destination labels", () => {
+    expect(preReleaseDestinationLabel("Spotify", "presave")).toBe("Open on Spotify");
+    expect(preReleaseDestinationLabel("Spotify", "live")).toBe("Spotify");
+  });
   it("resolves destinations and style defaults", () => {
     const resolved = resolvePreviewDraft({
       title: "Night Drive",
@@ -30,7 +35,7 @@ describe("preview-draft", () => {
     } satisfies PreviewDraft);
 
     expect(resolved.effectiveMode).toBe("presave");
-    expect(resolved.destinations[0]?.cta).toBe("Pre-save on Spotify");
+    expect(resolved.destinations[0]?.cta).toBe("Open on Spotify");
   });
 
   it("treats past presave dates as live", () => {

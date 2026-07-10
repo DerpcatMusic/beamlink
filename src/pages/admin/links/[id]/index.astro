@@ -145,7 +145,7 @@ const days = daysUntilRelease(link.track.release_at);
 const artistLabel = link.track.artist_name || "Unknown artist";
 const artworkSrc = artworkPublicPath(link.track);
 const modeBadge = effectiveMode === "presave"
-  ? { label: `Pre-save${days !== null ? ` · ${days}d` : ""}`, variant: "presave" }
+  ? { label: `Pre-release${days !== null ? ` · ${days}d` : ""}`, variant: "presave" }
   : { label: "Live", variant: "live" };
 const identityBadges = [modeBadge, { label: link.status, variant: link.status }];
 const isDraft = link.status === "draft";
@@ -311,7 +311,7 @@ function hrefWith(overrides: Record<string, string>, removes: string[] = []): st
       <div class="admin-toolbar">
         {isDraft && <Button variant="accent" id="publishButton" type="button">Publish link</Button>}
         <Button variant="secondary" href={previewUrl} target="_blank" rel="noreferrer"><Icon name="open" /> Draft preview</Button>
-        <Button variant="secondary" href={`/api/admin/links/${link.id}/subscribers`}>Export subscribers</Button>
+        <Button variant="secondary" href={`/api/admin/links/${link.id}/subscribers`}>Export email signups</Button>
         {!isDraft && <Button variant="secondary" id="publishButton" type="button">Republish</Button>}
         <Button variant="ghost" id="archiveButton" type="button"><Icon name="archive" /> Archive</Button>
       </div>

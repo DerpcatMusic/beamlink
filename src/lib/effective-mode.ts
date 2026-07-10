@@ -19,11 +19,8 @@ export function resolvePaidClickEventName(link: SmartLink): string {
   return link.paid_click_event_name || "Stream_Click_Paid";
 }
 
-export function presaveDestinationLabel(platformLabel: string, mode: LinkMode): string {
-  if (mode !== "presave") return platformLabel;
-  if (platformLabel === "Spotify") return "Pre-save on Spotify";
-  if (platformLabel === "Apple Music") return "Pre-save on Apple Music";
-  return `Pre-save on ${platformLabel}`;
+export function preReleaseDestinationLabel(platformLabel: string, mode: LinkMode): string {
+  return mode === "presave" ? `Open on ${platformLabel}` : platformLabel;
 }
 
 export function daysUntilRelease(releaseAt: string | null): number | null {

@@ -32,7 +32,7 @@ const effectiveMode = effectiveLinkMode(link);
 const days = daysUntilRelease(link.track.release_at);
 const identityBadges = [
   effectiveMode === "presave"
-    ? { label: `Pre-save${days !== null ? ` · ${days}d` : ""}`, variant: "presave" }
+    ? { label: `Pre-release${days !== null ? ` · ${days}d` : ""}`, variant: "presave" }
     : { label: "Live", variant: "live" },
   { label: link.status, variant: link.status }
 ];
@@ -108,7 +108,7 @@ const identityBadges = [
       <section class="form-block">
         <div class="block-head">
           <h2 class="section-title">Release behavior</h2>
-          <p class="block-copy" id="modeHint">A future release date switches to pre-save.</p>
+          <p class="block-copy" id="modeHint">A future release date switches to a pre-release page.</p>
         </div>
         <div class="block-body field-grid">
           <Field label="Release date" for="releaseAt" hint={link.track.release_at ? `Stored as ${formatShortDate(link.track.release_at)}` : "Leave empty for a live link"}>
@@ -117,7 +117,7 @@ const identityBadges = [
           <Field label="Mode" for="mode">
             <select id="mode" name="mode">
               <option value="live" selected={link.mode === "live"}>Live now</option>
-              <option value="presave" selected={link.mode === "presave"}>Pre-save until release</option>
+              <option value="presave" selected={link.mode === "presave"}>Pre-release until launch</option>
             </select>
           </Field>
         </div>
@@ -181,7 +181,7 @@ const identityBadges = [
           <Field label="View event name" for="viewEventName" hint="Landing page always fires PageView; this field is no longer applied.">
             <input id="viewEventName" name="viewEventName" value={link.view_event_name} />
           </Field>
-          <Field label="Click event name" for="clickEventName" hint="The streaming tap = your conversion. Default: Lead (pre-save), ViewContent (live)">
+          <Field label="Click event name" for="clickEventName" hint="The streaming tap = your conversion. Default: Lead (pre-release), ViewContent (live)">
             <input id="clickEventName" name="clickEventName" value={link.click_event_name ?? ""} placeholder="Lead / ViewContent" />
           </Field>
           <Field label="Paid click event" for="paidClickEventName" hint="Extra event that also fires for fbclid/meta/paid taps (separate from ViewContent).">
@@ -249,7 +249,7 @@ const identityBadges = [
       const date = new Date(raw);
       if (!Number.isNaN(date.getTime()) && date.getTime() > Date.now()) {
         mode.value = "presave";
-        modeHint.textContent = "Future date — pre-save until release.";
+        modeHint.textContent = "Future date — pre-release until launch.";
         return;
       }
       mode.value = "live";

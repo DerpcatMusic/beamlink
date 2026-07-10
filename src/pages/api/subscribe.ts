@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { getPublishedLink, incrementDailyMetric, subscribeEmail } from "@lib/db";
+import { getPublishedLink, subscribeEmail } from "@lib/db";
 import { badRequest, json, notFound, readJson } from "@lib/http";
 import { defer, getRuntimeEnv } from "@lib/runtime";
 import { isBot } from "@lib/bots";
@@ -37,7 +37,6 @@ export const POST: APIRoute = async (context) => {
         cookies: trackingCookies,
         email: body.email
       }));
-      defer(context, incrementDailyMetric(env, link.id, "presaves"));
       defer(context, recordMetricEvent(env, { linkId: link.id, kind: "subscribe", request: context.request, cookies: trackingCookies }));
     }
 

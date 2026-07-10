@@ -8,12 +8,12 @@ product
 
 ## Users
 
-- **Label owner / operator** — self-hosts Beamlink, creates smartlinks and presaves for releases, wires them into Meta ad campaigns, checks analytics daily to steer spend. Fluent in tools like SubmitHub, Linkfire, feature.fm; expects dense, fast, no-hand-holding UI.
-- **Fans** — arrive on the public link page from an Instagram/Facebook ad on a phone, in a feed-scrolling mindset. One job: get them to tap through to Spotify (or pre-save) in under three seconds.
+- **Label owner / operator** — self-hosts Beamlink, creates smartlinks and pre-release pages, wires them into Meta ad campaigns, checks analytics daily to steer spend. Fluent in tools like SubmitHub, Linkfire, feature.fm; expects dense, fast, no-hand-holding UI.
+- **Fans** — arrive on the public link page from an Instagram/Facebook ad on a phone, in a feed-scrolling mindset. One job: get them to tap through to a streaming destination in under three seconds.
 
 ## Product Purpose
 
-An open-source, self-hosted music smartlink + presave tool on Cloudflare Workers that beats Hypeddit/Linkfire/SubmitHub on two axes: page speed (edge-rendered, zero client framework) and pixel accuracy (first-party server-side Meta CAPI with server-set identifiers). Success = faster link pages than the incumbents, trustworthy per-campaign metrics, and ad optimization signals Meta can actually match.
+An open-source, self-hosted music smartlink + pre-release tool on Cloudflare Workers that beats Hypeddit/Linkfire/SubmitHub on two axes: page speed (edge-rendered, zero client framework) and pixel accuracy (first-party server-side Meta CAPI with server-set identifiers). Success = faster link pages than the incumbents, trustworthy per-campaign metrics, and ad optimization signals Meta can actually match.
 
 ## Brand Personality
 

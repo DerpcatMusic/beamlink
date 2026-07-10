@@ -365,7 +365,7 @@ export async function queueMetaEvent(env: RuntimeEnv, request: Request, link: Sm
   const url = new URL(request.url);
   const cookies = options.cookies ?? resolveTrackingCookies(request);
   const linkType = effectiveLinkMode(link) === "presave" ? "pre_release" : "post_release";
-  // Attach a value only to conversion events (the tap / pre-save / email signup),
+  // Attach a value only to conversion events (the tap / pre-release action / email signup),
   // never to PageView — this is what unlocks value-based optimization.
   const conversionValue = options.kind === "view" ? undefined : getMetaConversionValue(env);
   const geo = await hashedGeoFromRequest(request);
@@ -851,9 +851,9 @@ function defaultAction(event: QueuedMetaEvent): string {
 function ctaForPlatform(platform: string | undefined, linkType: "pre_release" | "post_release"): string | undefined {
   if (!platform) return undefined;
   if (linkType === "pre_release") {
-    if (platform === "spotify") return "Pre-save on Spotify";
-    if (platform === "apple") return "Pre-save on Apple Music";
-    return "Pre-save";
+    if (platform === "spotify") return "Open on Spotify";
+    if (platform === "apple") return "Open on Apple Music";
+    return "Pre-release tap";
   }
   if (platform === "spotify") return "Play on Spotify";
   if (platform === "apple") return "Play on Apple Music";

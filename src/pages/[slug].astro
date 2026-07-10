@@ -8,7 +8,7 @@ import { recordMetricEvent } from "@lib/metrics";
 import { isBot } from "@lib/bots";
 import { getMetaConversionValue, getMetaCurrency, getMetaPixelId } from "@lib/settings";
 import { artworkPublicPath } from "@lib/artwork";
-import { effectiveLinkMode, presaveDestinationLabel, resolveClickEventName, resolvePaidClickEventName } from "@lib/effective-mode";
+import { effectiveLinkMode, preReleaseDestinationLabel, resolveClickEventName, resolvePaidClickEventName } from "@lib/effective-mode";
 import { spotifyAppUri, spotifyDestinationUrl } from "@lib/spotify-links";
 
 const env = getRuntimeEnv(Astro);
@@ -99,7 +99,7 @@ const pixelScript = trackTracking
   : null;
 const pageTitle = `${link.track.title} — ${link.track.artist_name}`;
 const description = isPresave
-  ? `Pre-save ${link.track.title} by ${link.track.artist_name}.`
+  ? `${link.track.title} by ${link.track.artist_name} is coming soon.`
   : `Listen to ${link.track.title} by ${link.track.artist_name}.`;
 const pageUrl = `${baseUrl}/${link.slug}${isDraftPreview ? "?preview=1" : ""}`;
 
@@ -117,7 +117,7 @@ const destinationRows = sortedDestinations.map((destination) => {
   const clickEventId = createEventId(kind, link, destination.platform);
   const paidClickEventIdValue = !isPresave && paidAttribution ? paidEventId(clickEventId) : "";
   const outboundSuffix = trackingQuerySuffix(Astro.url, { eid: clickEventId });
-  const cta = presaveDestinationLabel(destination.label, effectiveMode);
+  const cta = preReleaseDestinationLabel(destination.label, effectiveMode);
   const fallbackUrl = spotifyDestinationUrl(link, destination);
   const appUri = !isPresave && destination.platform === "spotify" && link.spotify_open_behavior === "app_first"
     ? spotifyAppUri(destination.url, link.spotify_context_url)

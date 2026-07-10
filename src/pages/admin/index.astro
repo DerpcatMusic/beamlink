@@ -59,7 +59,7 @@ for (const link of links) {
         <select id="modeFilter">
           <option value="all">All</option>
           <option value="live">Live</option>
-          <option value="presave">Pre-save</option>
+          <option value="presave">Pre-release</option>
         </select>
       </label>
     </div>
@@ -90,7 +90,7 @@ for (const link of links) {
                   <div class="row-title">
                     <strong>{link.link_name}</strong>
                     <Badge variant={effectiveMode}>
-                      {effectiveMode === "presave" ? `Pre-save${days !== null ? ` · ${days}d` : ""}` : "Live"}
+                      {effectiveMode === "presave" ? `Pre-release${days !== null ? ` · ${days}d` : ""}` : "Live"}
                     </Badge>
                     <Badge variant={link.status}>{link.status}</Badge>
                   </div>

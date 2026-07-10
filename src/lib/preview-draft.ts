@@ -1,4 +1,4 @@
-import { presaveDestinationLabel } from "@lib/effective-mode";
+import { preReleaseDestinationLabel } from "@lib/effective-mode";
 import { normalizeButtonStyle, normalizePageBackgroundStyle } from "@lib/page-style";
 import {
   DEFAULT_PAGE_STYLE_OPTIONS,
@@ -93,7 +93,7 @@ export function resolvePreviewDraft(draft: PreviewDraft): ResolvedPreviewDraft {
       return {
         platform: platform as Platform,
         label,
-        cta: presaveDestinationLabel(label, effectiveMode)
+        cta: preReleaseDestinationLabel(label, effectiveMode)
       };
     })
     .filter((row): row is PreviewDestination => row !== null)

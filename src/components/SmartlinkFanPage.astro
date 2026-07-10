@@ -158,7 +158,7 @@ const asciiEnhance = pageBackgroundStyle === "ascii";
       fetchpriority="high"
     />
     <div class="copy">
-      <p class="mode">{isPresave ? "Pre-save" : "Listen now"}</p>
+      <p class="mode">{isPresave ? "Pre-release" : "Listen now"}</p>
       <h1>{title}</h1>
       <p class="artist">{artistName}</p>
       {isrc && <p class="isrc">ISRC {isrc}</p>}
@@ -172,7 +172,7 @@ const asciiEnhance = pageBackgroundStyle === "ascii";
 
   {isPresave && interactive && (
     <form class="subscribe" id="subscribeForm">
-      <label for="email">Email for release day reminder</label>
+      <label for="email">Get release updates</label>
       <label class="honeypot" aria-hidden="true">Website <input id="website" name="website" tabindex="-1" autocomplete="off" /></label>
       <div class="subscribe-row">
         <input
@@ -184,7 +184,7 @@ const asciiEnhance = pageBackgroundStyle === "ascii";
           autocomplete="email"
           inputmode="email"
         />
-        <button class="button subscribe-submit" type="submit">Notify me</button>
+        <button class="button subscribe-submit" type="submit">Join list</button>
       </div>
       <p class="subscribe-status muted" id="subscribeStatus" role="status" aria-live="polite"></p>
       <p class="subscribe-disclosure muted">Your email is shared with this link's owner for release updates.</p>
