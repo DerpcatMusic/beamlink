@@ -223,9 +223,10 @@ function stepHref(stepId: OnboardingStepId): string {
           <Field label="Meta Pixel ID" for="metaPixelId" hint={envPixelId ? `Active: ${envPixelId}` : "Or set META_PIXEL_ID secret."}>
             <input id="metaPixelId" name="metaPixelId" data-sensitive value={metaPixelIdSetting ?? ""} placeholder="1234567890" />
           </Field>
-          <Field label="Meta CAPI access token" for="metaAccessToken" hint={metaAccessToken ? "Token configured. Leave blank to keep." : "Required for server-side events."}>
-            <input id="metaAccessToken" name="metaAccessToken" data-sensitive type="password" autocomplete="off" placeholder="Leave blank to keep current token" />
-          </Field>
+          <div class="field">
+            <span>Meta CAPI access token</span>
+            <p class="muted">{metaAccessToken ? "Configured as a Worker secret." : "Run wrangler secret put META_ACCESS_TOKEN in your deployment shell."}</p>
+          </div>
           <div class="form-actions">
             <Button variant="secondary" type="submit">Save Meta settings</Button>
             <p class="muted" id="secretsSaveStatus" aria-live="polite"></p>
@@ -487,8 +488,7 @@ wrangler secret put ADMIN_SESSION_SECRET`}</code></pre>
         method: "PATCH",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          metaPixelId: document.querySelector("#metaPixelId")?.value.trim() ?? "",
-          metaAccessToken: document.querySelector("#metaAccessToken")?.value.trim() ?? ""
+          metaPixelId: document.querySelector("#metaPixelId")?.value.trim() ?? ""
         })
       });
       const data = await response.json();

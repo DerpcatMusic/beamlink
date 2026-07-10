@@ -56,9 +56,11 @@ const qualityEvents = metaQuality?.events ?? [];
       <Field label="Meta Pixel ID" for="metaPixelId" hint={pixelConfigured ? `Active: ${envPixelId}` : "Set here or in Wrangler env."}>
         <input id="metaPixelId" name="metaPixelId" data-sensitive value={metaPixelId ?? ""} placeholder="From env if empty" />
       </Field>
-      <Field label="Meta CAPI access token" for="metaAccessToken" hint={metaAccessToken ? "Token stored. Leave blank to keep it." : "Paste the dataset access token."}>
-        <input id="metaAccessToken" name="metaAccessToken" data-sensitive type="password" autocomplete="off" placeholder="Leave blank to keep current token" />
-      </Field>
+      <div class="field">
+        <span>Meta CAPI access token</span>
+        <p class="muted">{metaAccessToken ? "Configured as a Worker secret." : "Missing Worker secret. CAPI is paused."}</p>
+        <pre class="code-block"><code>wrangler secret put META_ACCESS_TOKEN</code></pre>
+      </div>
       <Field label="Meta API version" for="metaApiVersion">
         <input id="metaApiVersion" name="metaApiVersion" value={metaApiVersion} placeholder="v23.0" />
       </Field>
@@ -155,7 +157,6 @@ const qualityEvents = metaQuality?.events ?? [];
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           metaPixelId: document.querySelector("#metaPixelId").value.trim(),
-          metaAccessToken: document.querySelector("#metaAccessToken").value.trim(),
           metaApiVersion: document.querySelector("#metaApiVersion").value.trim(),
           metaTestEventCode: document.querySelector("#metaTestEventCode").value.trim(),
           metaAdAccountId: document.querySelector("#metaAdAccountId").value.trim()

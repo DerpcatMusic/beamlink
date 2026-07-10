@@ -2,7 +2,6 @@ import type { RuntimeEnv } from "@lib/runtime";
 
 export type SettingKey =
   | "meta_pixel_id"
-  | "meta_access_token"
   | "meta_api_version"
   | "meta_test_event_code"
   | "meta_ad_account_id"
@@ -35,9 +34,7 @@ export async function getMetaTestEventCode(env: RuntimeEnv): Promise<string | un
 }
 
 export async function getMetaAccessToken(env: RuntimeEnv): Promise<string | undefined> {
-  const dbValue = await getSetting(env, "meta_access_token");
-  if (dbValue !== undefined && dbValue !== "") return dbValue;
-  return env.META_ACCESS_TOKEN || undefined;
+  return env.META_ACCESS_TOKEN?.trim() || undefined;
 }
 
 export async function getMetaApiVersion(env: RuntimeEnv): Promise<string> {

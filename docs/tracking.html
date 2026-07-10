@@ -58,6 +58,10 @@
           <li>Optional: set <code>META_TEST_EVENT_CODE</code> while validating in Test Events.</li>
           <li>Use the onboarding pixel test step or admin settings to send a test event.</li>
         </ol>
+        <p>
+          Store <code>META_ACCESS_TOKEN</code> only with <code>wrangler secret put META_ACCESS_TOKEN</code>.
+          Before applying migration <code>0014_remove_stored_meta_token.sql</code>, set the Worker secret and verify a test event; the migration removes legacy D1 token copies.
+        </p>
 
         <h2>First-party cookies</h2>
         <div class="table-wrap">

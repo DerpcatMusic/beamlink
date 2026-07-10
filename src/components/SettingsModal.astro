@@ -26,10 +26,11 @@ import ScreenshotSafeToggle from "@components/ScreenshotSafeToggle.astro";
         <span>Meta Pixel / Dataset ID</span>
         <input id="settingsMetaPixelId" name="metaPixelId" data-sensitive inputmode="numeric" placeholder="123456789012345" />
       </label>
-      <label class="field">
+      <div class="field">
         <span>Meta CAPI access token</span>
-        <input id="settingsMetaAccessToken" name="metaAccessToken" data-sensitive type="password" autocomplete="off" placeholder="Leave blank to keep current token" />
-      </label>
+        <p class="muted" id="settingsTokenStatus">Checking Worker secret…</p>
+        <code>wrangler secret put META_ACCESS_TOKEN</code>
+      </div>
       <label class="field">
         <span>Meta API version</span>
         <input id="settingsMetaApiVersion" name="metaApiVersion" placeholder="v23.0" />
@@ -79,7 +80,7 @@ import ScreenshotSafeToggle from "@components/ScreenshotSafeToggle.astro";
   const saveStatus = document.querySelector("#settingsSaveStatus");
   const rows = document.querySelector("#settingsCapiRows");
   const pixelInput = document.querySelector("#settingsMetaPixelId");
-  const tokenInput = document.querySelector("#settingsMetaAccessToken");
+  const tokenStatus = document.querySelector("#settingsTokenStatus");
   const apiVersionInput = document.querySelector("#settingsMetaApiVersion");
   const testCodeInput = document.querySelector("#settingsMetaTestEventCode");
   const adAccountInput = document.querySelector("#settingsMetaAdAccountId");
@@ -97,8 +98,9 @@ import ScreenshotSafeToggle from "@components/ScreenshotSafeToggle.astro";
         ? "Pixel set, access token missing. CAPI paused."
         : "Not connected. First-party tracking only.";
     summary.textContent = data?.hasMetaAccessToken
-      ? "Token stored. Paste a new token only when rotating credentials."
-      : "Paste the dataset access token to enable server-side events.";
+      ? "Access token configured as a Worker secret."
+      : "Run wrangler secret put META_ACCESS_TOKEN to enable server-side events.";
+    tokenStatus.textContent = data?.hasMetaAccessToken ? "Configured as a Worker secret." : "Missing Worker secret.";
     testButton.disabled = !capiConfigured;
   }
 
@@ -137,7 +139,6 @@ import ScreenshotSafeToggle from "@components/ScreenshotSafeToggle.astro";
     if (!response.ok) throw new Error(data.error || "Settings load failed.");
 
     pixelInput.value = data.metaPixelId ?? "";
-    tokenInput.value = "";
     apiVersionInput.value = data.metaApiVersion ?? "v23.0";
     testCodeInput.value = data.metaTestEventCode ?? "";
     adAccountInput.value = data.metaAdAccountId ?? "";
@@ -175,7 +176,6 @@ import ScreenshotSafeToggle from "@components/ScreenshotSafeToggle.astro";
     saveStatus.textContent = "Saving…";
     const body = {
       metaPixelId: pixelInput.value.trim(),
-      metaAccessToken: tokenInput.value.trim(),
       metaApiVersion: apiVersionInput.value.trim(),
       metaTestEventCode: testCodeInput.value.trim(),
       metaAdAccountId: adAccountInput.value.trim()

@@ -814,14 +814,14 @@ describe("Meta settings", () => {
     } as any;
   }
 
-  it("uses stored Meta access token before env secret", async () => {
+  it("uses the Worker secret even when a legacy stored token exists", async () => {
     const env = settingsEnv({ meta_access_token: "stored-token" }, { META_ACCESS_TOKEN: "env-token" });
-    await expect(getMetaAccessToken(env)).resolves.toBe("stored-token");
+    await expect(getMetaAccessToken(env)).resolves.toBe("env-token");
   });
 
-  it("falls back to env token when stored token is blank", async () => {
-    const env = settingsEnv({ meta_access_token: "" }, { META_ACCESS_TOKEN: "env-token" });
-    await expect(getMetaAccessToken(env)).resolves.toBe("env-token");
+  it("returns undefined when the Worker secret is missing", async () => {
+    const env = settingsEnv({ meta_access_token: "stored-token" });
+    await expect(getMetaAccessToken(env)).resolves.toBeUndefined();
   });
 
   it("uses stored Meta API version before env value", async () => {

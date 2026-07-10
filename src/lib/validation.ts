@@ -62,11 +62,10 @@ export const subscribeBodySchema = z.object({
 
 export const settingsBodySchema = z.object({
   metaPixelId: z.string().optional(),
-  metaAccessToken: z.string().optional(),
   metaApiVersion: z.string().regex(/^v\d+\.\d+$/, "Meta API version must look like v23.0.").or(z.literal("")).optional(),
   metaTestEventCode: z.string().optional(),
   metaAdAccountId: z.string().optional()
-});
+}).strict();
 
 const onboardingStepIds = [
   "welcome",
