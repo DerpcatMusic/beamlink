@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   asciiPatternDataUri,
   compactAsciiPatternDataUri,
+  appearancePresetFor,
   STYLE_CARD_PREVIEW_PALETTE,
   backgroundClasses,
   buttonClasses,
@@ -33,6 +34,17 @@ describe("normalizeButtonStyle", () => {
   it("accepts valid button styles", () => {
     expect(normalizeButtonStyle("full-color")).toBe("full-color");
     expect(normalizeButtonStyle("gradient-logo")).toBe("gradient-logo");
+  });
+});
+
+describe("appearance presets", () => {
+  it.each([
+    ["blur", "monochrome", "clean"],
+    ["mesh", "logo-color", "color"],
+    ["vinyl", "full-color", "bold"],
+    ["ascii", "colored-border", "custom"]
+  ] as const)("maps %s/%s to %s", (background, buttons, expected) => {
+    expect(appearancePresetFor(background, buttons)).toBe(expected);
   });
 });
 

@@ -19,6 +19,20 @@ export type ButtonStyle = (typeof BUTTON_STYLES)[number];
 export const DEFAULT_PAGE_BACKGROUND_STYLE: PageBackgroundStyle = "blur";
 export const DEFAULT_BUTTON_STYLE: ButtonStyle = "monochrome";
 
+export const APPEARANCE_PRESETS = {
+  clean: { label: "Clean", description: "Soft artwork with quiet neutral buttons.", background: "blur", buttons: "monochrome" },
+  color: { label: "Color", description: "Artwork-led gradients with recognizable platform icons.", background: "mesh", buttons: "logo-color" },
+  bold: { label: "Bold", description: "Graphic vinyl motion with solid platform buttons.", background: "vinyl", buttons: "full-color" }
+} as const satisfies Record<string, { label: string; description: string; background: PageBackgroundStyle; buttons: ButtonStyle }>;
+export type AppearancePresetId = keyof typeof APPEARANCE_PRESETS;
+
+export function appearancePresetFor(background: PageBackgroundStyle, buttons: ButtonStyle): AppearancePresetId | "custom" {
+  for (const [id, preset] of Object.entries(APPEARANCE_PRESETS) as Array<[AppearancePresetId, (typeof APPEARANCE_PRESETS)[AppearancePresetId]]>) {
+    if (preset.background === background && preset.buttons === buttons) return id;
+  }
+  return "custom";
+}
+
 export const pageBackgroundLabels: Record<PageBackgroundStyle, string> = {
   blur: "Blurred artwork",
   ascii: "ASCII mosaic",

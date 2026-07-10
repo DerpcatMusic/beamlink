@@ -1,9 +1,11 @@
 ---
 import {
   BUTTON_STYLES,
+  APPEARANCE_PRESETS,
   PAGE_BACKGROUND_STYLES,
   STYLE_CARD_PREVIEW_PALETTE,
   asciiPatternDataUri,
+  appearancePresetFor,
   buttonStyleDescriptions,
   buttonStyleLabels,
   pageBackgroundDescriptions,
@@ -27,6 +29,7 @@ interface Props {
 
 const { backgroundStyle, buttonStyle, pageStyleOptions = null, paletteJson = null } = Astro.props;
 const options = normalizePageStyleOptions(pageStyleOptions ?? DEFAULT_PAGE_STYLE_OPTIONS);
+const activePreset = appearancePresetFor(backgroundStyle, buttonStyle);
 const parsed = parseTrackPalette(paletteJson);
 const cardPalette: TrackPaletteVars = {
   "--page-tint": parsed["--page-tint"] ?? STYLE_CARD_PREVIEW_PALETTE["--page-tint"]!,
@@ -52,6 +55,22 @@ const cardStyle = [
     <p class="block-copy">Background and platform button styles fans see on the public link.</p>
   </div>
   <div class="block-body appearance-body">
+    <fieldset class="style-fieldset preset-fieldset">
+      <legend>Quick styles</legend>
+      <div class="preset-grid">
+        {Object.entries(APPEARANCE_PRESETS).map(([id, preset]) => (
+          <label class:list={["preset-card", activePreset === id && "is-selected"]}>
+            <input type="radio" name="appearancePreset" value={id} checked={activePreset === id} data-preset-radio data-background={preset.background} data-buttons={preset.buttons} />
+            <span class:list={["preset-swatch", `preset-swatch--${id}`]} aria-hidden="true"><i></i><i></i></span>
+            <span><strong>{preset.label}</strong><small>{preset.description}</small></span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+
+    <details class="advanced-appearance" data-style-advanced open={activePreset === "custom"}>
+      <summary><span>Advanced</span><small>Background, buttons, motion, and intensity</small></summary>
+      <div class="advanced-appearance__body">
     <fieldset class="style-fieldset">
       <legend>Background</legend>
       <div class="style-grid">
@@ -175,6 +194,8 @@ const cardStyle = [
         ))}
       </div>
     </fieldset>
+      </div>
+    </details>
   </div>
 </section>
 
@@ -185,6 +206,19 @@ const cardStyle = [
 
     function selectedBackground() {
       return root.querySelector("input[name='pageBackgroundStyle']:checked")?.value || "blur";
+    }
+
+    function syncPresetSelection() {
+      const background = selectedBackground();
+      const buttons = root.querySelector("input[name='buttonStyle']:checked")?.value || "monochrome";
+      let matched = false;
+      for (const input of root.querySelectorAll("[data-preset-radio]")) {
+        const selected = input.dataset.background === background && input.dataset.buttons === buttons;
+        input.checked = selected;
+        input.closest(".preset-card")?.classList.toggle("is-selected", selected);
+        matched ||= selected;
+      }
+      if (!matched) root.querySelector("[data-style-advanced]")?.setAttribute("open", "");
     }
 
     function syncPanels() {
@@ -204,13 +238,28 @@ const cardStyle = [
     }
 
     for (const input of root.querySelectorAll("input[data-style-radio='background']")) {
-      input.addEventListener("change", syncPanels);
+      input.addEventListener("change", () => { syncPanels(); syncPresetSelection(); });
+    }
+    for (const input of root.querySelectorAll("input[name='buttonStyle']")) {
+      input.addEventListener("change", syncPresetSelection);
+    }
+    for (const input of root.querySelectorAll("[data-preset-radio]")) {
+      input.addEventListener("change", () => {
+        if (!input.checked) return;
+        const background = root.querySelector(`input[name='pageBackgroundStyle'][value="${input.dataset.background}"]`);
+        const buttons = root.querySelector(`input[name='buttonStyle'][value="${input.dataset.buttons}"]`);
+        if (background) { background.checked = true; background.dispatchEvent(new Event("change", { bubbles: true })); }
+        if (buttons) { buttons.checked = true; buttons.dispatchEvent(new Event("change", { bubbles: true })); }
+        root.querySelector("[data-style-advanced]")?.removeAttribute("open");
+        syncPresetSelection();
+      });
     }
     for (const input of root.querySelectorAll("[data-knob]")) {
       input.addEventListener("input", () => syncOutputs(input));
       syncOutputs(input);
     }
     syncPanels();
+    syncPresetSelection();
 
     window.collectPageStyleOptions = function collectPageStyleOptions() {
       const num = (name, fallback) => {
@@ -253,11 +302,78 @@ const cardStyle = [
     gap: 1.35rem;
   }
 
+  .preset-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .preset-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.7rem;
+    min-height: 4.5rem;
+    padding: 0.7rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    cursor: pointer;
+  }
+
+  .preset-card:hover { border-color: color-mix(in oklch, var(--accent) 35%, var(--border-strong)); }
+  .preset-card.is-selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .preset-card input { position: absolute; opacity: 0; pointer-events: none; }
+  .preset-card strong, .preset-card small { display: block; }
+  .preset-card strong { color: var(--foreground); font-size: var(--text-sm); }
+  .preset-card small { margin-top: 0.18rem; color: var(--muted); font-size: var(--text-xs); line-height: 1.25; }
+
+  .preset-swatch {
+    display: grid;
+    align-content: center;
+    gap: 0.25rem;
+    width: 3rem;
+    height: 3rem;
+    padding: 0.45rem;
+    border-radius: var(--radius-sm);
+    background: radial-gradient(circle at 25% 20%, var(--card-primary), transparent 55%), var(--card-bg);
+  }
+  .preset-swatch i { height: 0.35rem; border-radius: 99px; background: oklch(0.96 0.01 260); }
+  .preset-swatch--color { background: radial-gradient(circle at 25% 20%, var(--card-primary), transparent 48%), radial-gradient(circle at 80% 75%, var(--card-tint), transparent 55%), var(--card-bg); }
+  .preset-swatch--color i:first-child { background: #1ed760; }
+  .preset-swatch--bold { background: repeating-radial-gradient(circle, var(--card-tint) 0 2px, var(--card-bg) 3px 7px); }
+  .preset-swatch--bold i:first-child { background: #1ed760; }
+  .preset-swatch--bold i:last-child { background: #fa243c; }
+
+  .advanced-appearance {
+    border-top: 1px solid var(--border);
+    padding-top: 0.9rem;
+  }
+  .advanced-appearance summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+    color: var(--foreground);
+    font-size: var(--text-sm);
+    font-weight: 650;
+  }
+  .advanced-appearance summary small { color: var(--muted); font-size: var(--text-xs); font-weight: 400; }
+  .advanced-appearance__body { display: grid; gap: 1.35rem; padding-top: 0.9rem; }
+
   .style-fieldset {
     margin: 0;
     padding: 0;
     border: 0;
     min-width: 0;
+  }
+
+  @media (max-width: 720px) {
+    .preset-grid { grid-template-columns: 1fr; }
+    .advanced-appearance summary { align-items: flex-start; flex-direction: column; justify-content: center; gap: 0.1rem; }
   }
 
   .style-fieldset legend {
