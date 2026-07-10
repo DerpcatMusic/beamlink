@@ -406,12 +406,14 @@ const asciiEnhance = pageBackgroundStyle === "ascii";
     isolation: isolate;
   }
 
+  :global(.linkbeam-link--embedded),
   :global(.beamlink-link--embedded) {
     min-height: 0;
     overflow: hidden;
     background: var(--background);
   }
 
+  :global(.linkbeam-link--preview-pane),
   :global(.beamlink-link--preview-pane) {
     min-height: 100%;
     height: 100%;

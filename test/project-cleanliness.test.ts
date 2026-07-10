@@ -37,4 +37,10 @@ describe("project cleanup", () => {
     expect(marketingPage).toContain("<table>");
     expect(marketingPage).toContain('aria-label="Open navigation"');
   });
+
+  it("defines Linkbeam tokens and legacy aliases", () => {
+    expect(globalCss).toContain("--linkbeam-bg:");
+    expect(globalCss).toContain("--beamlink-bg: var(--linkbeam-bg)");
+    expect(globalCss).not.toMatch(/var\(--beamlink-/);
+  });
 });

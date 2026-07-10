@@ -6,7 +6,7 @@ interface Props extends LayoutHeadProps {
 }
 
 const { bodyClass = "", ...head } = Astro.props;
-const classes = ["beamlink-link", bodyClass].filter(Boolean).join(" ");
+const classes = ["linkbeam-link", bodyClass].filter(Boolean).join(" ");
 ---
 
 <BaseLayout {...head} surface="link" bodyClass={classes}>
@@ -14,16 +14,19 @@ const classes = ["beamlink-link", bodyClass].filter(Boolean).join(" ");
 </BaseLayout>
 
 <style>
-  .beamlink-link {
+  .linkbeam-link,
+  :global(.beamlink-link) {
     min-height: 100dvh;
   }
 
+  :global(body.linkbeam-link--preview-pane),
   :global(body.beamlink-link--preview-pane) {
     min-height: 100%;
     height: 100%;
     overflow: hidden;
   }
 
+  :global(html:has(body.linkbeam-link--preview-pane)),
   :global(html:has(body.beamlink-link--preview-pane)) {
     height: 100%;
   }

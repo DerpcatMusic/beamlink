@@ -2,176 +2,244 @@
   /* ── Beamlink design tokens (canonical) ─────────────────────────────────── */
 
   /* Color — admin instrument panel (default surface) */
-  --beamlink-bg: oklch(0.125 0.005 265);
-  --beamlink-ink: oklch(0.97 0.003 265);
-  --beamlink-surface: oklch(0.17 0.006 265);
-  --beamlink-surface-2: oklch(0.205 0.007 265);
-  --beamlink-surface-3: oklch(0.245 0.008 265);
-  --beamlink-inset: oklch(0.105 0.005 265);
-  --beamlink-muted: oklch(0.72 0.006 265);
-  --beamlink-faint: oklch(0.6 0.006 265);
-  --beamlink-border: oklch(1 0 0 / 0.07);
-  --beamlink-border-strong: oklch(1 0 0 / 0.13);
-  --beamlink-primary: oklch(0.93 0.003 265);
-  --beamlink-primary-ink: oklch(0.17 0.006 265);
-  --beamlink-accent: oklch(0.56 0.16 258);
-  --beamlink-accent-hover: oklch(0.5 0.16 258);
-  --beamlink-accent-soft: oklch(0.62 0.16 258 / 0.18);
-  --beamlink-accent-ink: oklch(0.99 0.01 258);
-  --beamlink-success: oklch(0.76 0.15 156);
-  --beamlink-success-soft: oklch(0.76 0.15 156 / 0.16);
-  --beamlink-warn: oklch(0.8 0.13 78);
-  --beamlink-warn-soft: oklch(0.8 0.13 78 / 0.16);
-  --beamlink-danger: oklch(0.68 0.19 22);
-  --beamlink-danger-soft: oklch(0.68 0.19 22 / 0.15);
+  --linkbeam-bg: oklch(0.125 0.005 265);
+  --linkbeam-ink: oklch(0.97 0.003 265);
+  --linkbeam-surface: oklch(0.17 0.006 265);
+  --linkbeam-surface-2: oklch(0.205 0.007 265);
+  --linkbeam-surface-3: oklch(0.245 0.008 265);
+  --linkbeam-inset: oklch(0.105 0.005 265);
+  --linkbeam-muted: oklch(0.72 0.006 265);
+  --linkbeam-faint: oklch(0.6 0.006 265);
+  --linkbeam-border: oklch(1 0 0 / 0.07);
+  --linkbeam-border-strong: oklch(1 0 0 / 0.13);
+  --linkbeam-primary: oklch(0.93 0.003 265);
+  --linkbeam-primary-ink: oklch(0.17 0.006 265);
+  --linkbeam-accent: oklch(0.56 0.16 258);
+  --linkbeam-accent-hover: oklch(0.5 0.16 258);
+  --linkbeam-accent-soft: oklch(0.62 0.16 258 / 0.18);
+  --linkbeam-accent-ink: oklch(0.99 0.01 258);
+  --linkbeam-success: oklch(0.76 0.15 156);
+  --linkbeam-success-soft: oklch(0.76 0.15 156 / 0.16);
+  --linkbeam-warn: oklch(0.8 0.13 78);
+  --linkbeam-warn-soft: oklch(0.8 0.13 78 / 0.16);
+  --linkbeam-danger: oklch(0.68 0.19 22);
+  --linkbeam-danger-soft: oklch(0.68 0.19 22 / 0.15);
 
   /* Spacing scale */
-  --beamlink-space-1: 0.25rem;
-  --beamlink-space-2: 0.5rem;
-  --beamlink-space-3: 0.75rem;
-  --beamlink-space-4: 1rem;
-  --beamlink-space-5: 1.25rem;
-  --beamlink-space-6: 1.5rem;
-  --beamlink-space-7: 2rem;
-  --beamlink-space-8: 2.5rem;
-  --beamlink-space-9: 3rem;
-  --beamlink-space-10: 4rem;
+  --linkbeam-space-1: 0.25rem;
+  --linkbeam-space-2: 0.5rem;
+  --linkbeam-space-3: 0.75rem;
+  --linkbeam-space-4: 1rem;
+  --linkbeam-space-5: 1.25rem;
+  --linkbeam-space-6: 1.5rem;
+  --linkbeam-space-7: 2rem;
+  --linkbeam-space-8: 2.5rem;
+  --linkbeam-space-9: 3rem;
+  --linkbeam-space-10: 4rem;
 
   /* Typography */
-  --beamlink-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --beamlink-font-display: "Onest", var(--beamlink-font-sans);
-  --beamlink-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --beamlink-text-xs: 0.79rem;
-  --beamlink-text-sm: 0.889rem;
-  --beamlink-text-base: 1rem;
-  --beamlink-text-lg: 1.125rem;
-  --beamlink-text-xl: 1.266rem;
-  --beamlink-text-2xl: 1.424rem;
-  --beamlink-display-sm: clamp(1.75rem, 2.5vw + 1rem, 2.5rem);
-  --beamlink-display-md: clamp(2.25rem, 4vw + 1rem, 3.5rem);
-  --beamlink-display-lg: clamp(2.75rem, 5vw + 1rem, 4.5rem);
-  --beamlink-prose-width: 68ch;
+  --linkbeam-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --linkbeam-font-display: "Onest", var(--linkbeam-font-sans);
+  --linkbeam-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --linkbeam-text-xs: 0.79rem;
+  --linkbeam-text-sm: 0.889rem;
+  --linkbeam-text-base: 1rem;
+  --linkbeam-text-lg: 1.125rem;
+  --linkbeam-text-xl: 1.266rem;
+  --linkbeam-text-2xl: 1.424rem;
+  --linkbeam-display-sm: clamp(1.75rem, 2.5vw + 1rem, 2.5rem);
+  --linkbeam-display-md: clamp(2.25rem, 4vw + 1rem, 3.5rem);
+  --linkbeam-display-lg: clamp(2.75rem, 5vw + 1rem, 4.5rem);
+  --linkbeam-prose-width: 68ch;
 
   /* Radii */
-  --beamlink-radius-sm: 7px;
-  --beamlink-radius: 10px;
-  --beamlink-radius-lg: 14px;
-  --beamlink-radius-pill: 999px;
+  --linkbeam-radius-sm: 7px;
+  --linkbeam-radius: 10px;
+  --linkbeam-radius-lg: 14px;
+  --linkbeam-radius-pill: 999px;
 
   /* Elevation */
-  --beamlink-shadow-sm: 0 1px 2px oklch(0 0 0 / 0.28);
-  --beamlink-shadow-panel: 0 1px 2px oklch(0 0 0 / 0.28);
-  --beamlink-shadow-pop: 0 8px 18px -10px oklch(0 0 0 / 0.65);
+  --linkbeam-shadow-sm: 0 1px 2px oklch(0 0 0 / 0.28);
+  --linkbeam-shadow-panel: 0 1px 2px oklch(0 0 0 / 0.28);
+  --linkbeam-shadow-pop: 0 8px 18px -10px oklch(0 0 0 / 0.65);
 
   /* Z-index scale */
-  --beamlink-z-base: 0;
-  --beamlink-z-dropdown: 10;
-  --beamlink-z-sticky: 20;
-  --beamlink-z-modal-backdrop: 30;
-  --beamlink-z-modal: 40;
-  --beamlink-z-toast: 50;
-  --beamlink-z-tooltip: 60;
+  --linkbeam-z-base: 0;
+  --linkbeam-z-dropdown: 10;
+  --linkbeam-z-sticky: 20;
+  --linkbeam-z-modal-backdrop: 30;
+  --linkbeam-z-modal: 40;
+  --linkbeam-z-toast: 50;
+  --linkbeam-z-tooltip: 60;
 
   /* Motion + interaction */
-  --beamlink-transition-fast: 150ms cubic-bezier(0.2, 0, 0, 1);
-  --beamlink-focus-ring: 2px solid var(--beamlink-accent);
-  --beamlink-focus-offset: 2px;
-  --beamlink-hover-border: var(--beamlink-border-strong);
-  --beamlink-disabled-opacity: 0.45;
-  --beamlink-max-width: 72rem;
-  --beamlink-shell-width: min(var(--beamlink-max-width), calc(100% - var(--beamlink-space-8)));
+  --linkbeam-transition-fast: 150ms cubic-bezier(0.2, 0, 0, 1);
+  --linkbeam-focus-ring: 2px solid var(--linkbeam-accent);
+  --linkbeam-focus-offset: 2px;
+  --linkbeam-hover-border: var(--linkbeam-border-strong);
+  --linkbeam-disabled-opacity: 0.45;
+  --linkbeam-max-width: 72rem;
+  --linkbeam-shell-width: min(var(--linkbeam-max-width), calc(100% - var(--linkbeam-space-8)));
 
-  /* ── Legacy aliases (prefer --beamlink-* in new code) ───────────────────── */
+  /* Legacy Beamlink aliases; remove only in a future breaking release. */
+  --beamlink-accent: var(--linkbeam-accent);
+  --beamlink-accent-hover: var(--linkbeam-accent-hover);
+  --beamlink-accent-ink: var(--linkbeam-accent-ink);
+  --beamlink-accent-soft: var(--linkbeam-accent-soft);
+  --beamlink-bg: var(--linkbeam-bg);
+  --beamlink-border: var(--linkbeam-border);
+  --beamlink-border-strong: var(--linkbeam-border-strong);
+  --beamlink-danger: var(--linkbeam-danger);
+  --beamlink-danger-soft: var(--linkbeam-danger-soft);
+  --beamlink-disabled-opacity: var(--linkbeam-disabled-opacity);
+  --beamlink-display-lg: var(--linkbeam-display-lg);
+  --beamlink-display-md: var(--linkbeam-display-md);
+  --beamlink-display-sm: var(--linkbeam-display-sm);
+  --beamlink-faint: var(--linkbeam-faint);
+  --beamlink-focus-offset: var(--linkbeam-focus-offset);
+  --beamlink-focus-ring: var(--linkbeam-focus-ring);
+  --beamlink-font-display: var(--linkbeam-font-display);
+  --beamlink-font-mono: var(--linkbeam-font-mono);
+  --beamlink-font-sans: var(--linkbeam-font-sans);
+  --beamlink-hover-border: var(--linkbeam-hover-border);
+  --beamlink-ink: var(--linkbeam-ink);
+  --beamlink-inset: var(--linkbeam-inset);
+  --beamlink-max-width: var(--linkbeam-max-width);
+  --beamlink-muted: var(--linkbeam-muted);
+  --beamlink-primary: var(--linkbeam-primary);
+  --beamlink-primary-ink: var(--linkbeam-primary-ink);
+  --beamlink-prose-width: var(--linkbeam-prose-width);
+  --beamlink-radius: var(--linkbeam-radius);
+  --beamlink-radius-lg: var(--linkbeam-radius-lg);
+  --beamlink-radius-pill: var(--linkbeam-radius-pill);
+  --beamlink-radius-sm: var(--linkbeam-radius-sm);
+  --beamlink-shadow-panel: var(--linkbeam-shadow-panel);
+  --beamlink-shadow-pop: var(--linkbeam-shadow-pop);
+  --beamlink-shadow-sm: var(--linkbeam-shadow-sm);
+  --beamlink-shell-width: var(--linkbeam-shell-width);
+  --beamlink-space-1: var(--linkbeam-space-1);
+  --beamlink-space-10: var(--linkbeam-space-10);
+  --beamlink-space-2: var(--linkbeam-space-2);
+  --beamlink-space-3: var(--linkbeam-space-3);
+  --beamlink-space-4: var(--linkbeam-space-4);
+  --beamlink-space-5: var(--linkbeam-space-5);
+  --beamlink-space-6: var(--linkbeam-space-6);
+  --beamlink-space-7: var(--linkbeam-space-7);
+  --beamlink-space-8: var(--linkbeam-space-8);
+  --beamlink-space-9: var(--linkbeam-space-9);
+  --beamlink-success: var(--linkbeam-success);
+  --beamlink-success-soft: var(--linkbeam-success-soft);
+  --beamlink-surface: var(--linkbeam-surface);
+  --beamlink-surface-2: var(--linkbeam-surface-2);
+  --beamlink-surface-3: var(--linkbeam-surface-3);
+  --beamlink-text-2xl: var(--linkbeam-text-2xl);
+  --beamlink-text-base: var(--linkbeam-text-base);
+  --beamlink-text-lg: var(--linkbeam-text-lg);
+  --beamlink-text-sm: var(--linkbeam-text-sm);
+  --beamlink-text-xl: var(--linkbeam-text-xl);
+  --beamlink-text-xs: var(--linkbeam-text-xs);
+  --beamlink-transition-fast: var(--linkbeam-transition-fast);
+  --beamlink-warn: var(--linkbeam-warn);
+  --beamlink-warn-soft: var(--linkbeam-warn-soft);
+  --beamlink-z-base: var(--linkbeam-z-base);
+  --beamlink-z-dropdown: var(--linkbeam-z-dropdown);
+  --beamlink-z-modal: var(--linkbeam-z-modal);
+  --beamlink-z-modal-backdrop: var(--linkbeam-z-modal-backdrop);
+  --beamlink-z-sticky: var(--linkbeam-z-sticky);
+  --beamlink-z-toast: var(--linkbeam-z-toast);
+  --beamlink-z-tooltip: var(--linkbeam-z-tooltip);
 
-  --background: var(--beamlink-bg);
-  --surface: var(--beamlink-surface);
-  --surface-2: var(--beamlink-surface-2);
-  --surface-3: var(--beamlink-surface-3);
-  --inset: var(--beamlink-inset);
-  --foreground: var(--beamlink-ink);
-  --muted: var(--beamlink-muted);
-  --faint: var(--beamlink-faint);
-  --border: var(--beamlink-border);
-  --border-strong: var(--beamlink-border-strong);
-  --primary: var(--beamlink-primary);
-  --primary-ink: var(--beamlink-primary-ink);
-  --accent: var(--beamlink-accent);
-  --accent-hover: var(--beamlink-accent-hover);
-  --accent-soft: var(--beamlink-accent-soft);
-  --accent-ink: var(--beamlink-accent-ink);
-  --success: var(--beamlink-success);
-  --success-soft: var(--beamlink-success-soft);
-  --warn: var(--beamlink-warn);
-  --warn-soft: var(--beamlink-warn-soft);
-  --danger: var(--beamlink-danger);
-  --danger-soft: var(--beamlink-danger-soft);
-  --radius-sm: var(--beamlink-radius-sm);
-  --radius: var(--beamlink-radius);
-  --radius-md: var(--beamlink-radius-lg);
-  --radius-lg: var(--beamlink-radius-lg);
-  --radius-pill: var(--beamlink-radius-pill);
-  --shadow-sm: var(--beamlink-shadow-sm);
-  --shadow-panel: var(--beamlink-shadow-panel);
-  --shadow-pop: var(--beamlink-shadow-pop);
-  --font: var(--beamlink-font-sans);
-  --mono: var(--beamlink-font-mono);
-  --transition-fast: var(--beamlink-transition-fast);
-  --focus-ring: var(--beamlink-focus-ring);
-  --focus-offset: var(--beamlink-focus-offset);
-  --hover-border: var(--beamlink-hover-border);
-  --disabled-opacity: var(--beamlink-disabled-opacity);
-  --text-xs: var(--beamlink-text-xs);
-  --text-sm: var(--beamlink-text-sm);
-  --text-base: var(--beamlink-text-base);
-  --text-lg: var(--beamlink-text-lg);
-  --text-xl: var(--beamlink-text-xl);
-  --text-2xl: var(--beamlink-text-2xl);
-  --space-1: var(--beamlink-space-1);
-  --space-2: var(--beamlink-space-2);
-  --space-3: var(--beamlink-space-3);
-  --space-4: var(--beamlink-space-4);
-  --space-5: var(--beamlink-space-5);
-  --space-6: var(--beamlink-space-6);
-  --space-7: var(--beamlink-space-7);
-  --space-8: var(--beamlink-space-8);
-  --step-1: var(--beamlink-text-xs);
-  --step-2: var(--beamlink-text-sm);
-  --step-3: var(--beamlink-text-xl);
-  --step-4: var(--beamlink-text-2xl);
+  /* Short component aliases. */
+
+  --background: var(--linkbeam-bg);
+  --surface: var(--linkbeam-surface);
+  --surface-2: var(--linkbeam-surface-2);
+  --surface-3: var(--linkbeam-surface-3);
+  --inset: var(--linkbeam-inset);
+  --foreground: var(--linkbeam-ink);
+  --muted: var(--linkbeam-muted);
+  --faint: var(--linkbeam-faint);
+  --border: var(--linkbeam-border);
+  --border-strong: var(--linkbeam-border-strong);
+  --primary: var(--linkbeam-primary);
+  --primary-ink: var(--linkbeam-primary-ink);
+  --accent: var(--linkbeam-accent);
+  --accent-hover: var(--linkbeam-accent-hover);
+  --accent-soft: var(--linkbeam-accent-soft);
+  --accent-ink: var(--linkbeam-accent-ink);
+  --success: var(--linkbeam-success);
+  --success-soft: var(--linkbeam-success-soft);
+  --warn: var(--linkbeam-warn);
+  --warn-soft: var(--linkbeam-warn-soft);
+  --danger: var(--linkbeam-danger);
+  --danger-soft: var(--linkbeam-danger-soft);
+  --radius-sm: var(--linkbeam-radius-sm);
+  --radius: var(--linkbeam-radius);
+  --radius-md: var(--linkbeam-radius-lg);
+  --radius-lg: var(--linkbeam-radius-lg);
+  --radius-pill: var(--linkbeam-radius-pill);
+  --shadow-sm: var(--linkbeam-shadow-sm);
+  --shadow-panel: var(--linkbeam-shadow-panel);
+  --shadow-pop: var(--linkbeam-shadow-pop);
+  --font: var(--linkbeam-font-sans);
+  --mono: var(--linkbeam-font-mono);
+  --transition-fast: var(--linkbeam-transition-fast);
+  --focus-ring: var(--linkbeam-focus-ring);
+  --focus-offset: var(--linkbeam-focus-offset);
+  --hover-border: var(--linkbeam-hover-border);
+  --disabled-opacity: var(--linkbeam-disabled-opacity);
+  --text-xs: var(--linkbeam-text-xs);
+  --text-sm: var(--linkbeam-text-sm);
+  --text-base: var(--linkbeam-text-base);
+  --text-lg: var(--linkbeam-text-lg);
+  --text-xl: var(--linkbeam-text-xl);
+  --text-2xl: var(--linkbeam-text-2xl);
+  --space-1: var(--linkbeam-space-1);
+  --space-2: var(--linkbeam-space-2);
+  --space-3: var(--linkbeam-space-3);
+  --space-4: var(--linkbeam-space-4);
+  --space-5: var(--linkbeam-space-5);
+  --space-6: var(--linkbeam-space-6);
+  --space-7: var(--linkbeam-space-7);
+  --space-8: var(--linkbeam-space-8);
+  --step-1: var(--linkbeam-text-xs);
+  --step-2: var(--linkbeam-text-sm);
+  --step-3: var(--linkbeam-text-xl);
+  --step-4: var(--linkbeam-text-2xl);
 }
 
 /* Marketing surface — clear product communication, light ambient */
 [data-surface="marketing"] {
-  --beamlink-bg: oklch(0.99 0.002 265);
-  --beamlink-ink: oklch(0.2 0.02 265);
-  --beamlink-surface: oklch(0.97 0.004 265);
-  --beamlink-surface-2: oklch(0.94 0.006 265);
-  --beamlink-surface-3: oklch(0.91 0.008 265);
-  --beamlink-inset: oklch(0.985 0.003 265);
-  --beamlink-muted: oklch(0.5 0.02 265);
-  --beamlink-faint: oklch(0.62 0.015 265);
-  --beamlink-border: oklch(0.2 0.02 265 / 0.1);
-  --beamlink-border-strong: oklch(0.2 0.02 265 / 0.16);
-  --beamlink-primary: oklch(0.2 0.02 265);
-  --beamlink-primary-ink: oklch(0.99 0.002 265);
-  --beamlink-accent: oklch(0.48 0.17 258);
-  --beamlink-accent-hover: oklch(0.42 0.17 258);
-  --beamlink-accent-soft: oklch(0.48 0.17 258 / 0.14);
-  --beamlink-accent-ink: oklch(0.99 0.01 258);
-  --beamlink-shadow-sm: 0 1px 2px oklch(0.2 0.02 265 / 0.06);
-  --beamlink-shadow-panel: 0 1px 2px oklch(0.2 0.02 265 / 0.05), 0 16px 40px -24px oklch(0.2 0.02 265 / 0.12);
-  --beamlink-shadow-pop: 0 12px 36px -12px oklch(0.2 0.02 265 / 0.18);
+  --linkbeam-bg: oklch(0.99 0.002 265);
+  --linkbeam-ink: oklch(0.2 0.02 265);
+  --linkbeam-surface: oklch(0.97 0.004 265);
+  --linkbeam-surface-2: oklch(0.94 0.006 265);
+  --linkbeam-surface-3: oklch(0.91 0.008 265);
+  --linkbeam-inset: oklch(0.985 0.003 265);
+  --linkbeam-muted: oklch(0.5 0.02 265);
+  --linkbeam-faint: oklch(0.62 0.015 265);
+  --linkbeam-border: oklch(0.2 0.02 265 / 0.1);
+  --linkbeam-border-strong: oklch(0.2 0.02 265 / 0.16);
+  --linkbeam-primary: oklch(0.2 0.02 265);
+  --linkbeam-primary-ink: oklch(0.99 0.002 265);
+  --linkbeam-accent: oklch(0.48 0.17 258);
+  --linkbeam-accent-hover: oklch(0.42 0.17 258);
+  --linkbeam-accent-soft: oklch(0.48 0.17 258 / 0.14);
+  --linkbeam-accent-ink: oklch(0.99 0.01 258);
+  --linkbeam-shadow-sm: 0 1px 2px oklch(0.2 0.02 265 / 0.06);
+  --linkbeam-shadow-panel: 0 1px 2px oklch(0.2 0.02 265 / 0.05), 0 16px 40px -24px oklch(0.2 0.02 265 / 0.12);
+  --linkbeam-shadow-pop: 0 12px 36px -12px oklch(0.2 0.02 265 / 0.18);
 }
 
 /* Public link surface — release is the brand; neutral until artwork palette applies */
 [data-surface="link"] {
-  --beamlink-bg: oklch(0.12 0.01 265);
-  --beamlink-ink: oklch(0.97 0.003 265);
-  --beamlink-surface: oklch(0.2 0.008 265);
-  --beamlink-surface-2: oklch(0.26 0.008 265);
-  --beamlink-muted: oklch(0.74 0.01 265);
-  --beamlink-border: oklch(1 0 0 / 0.12);
-  --beamlink-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --linkbeam-bg: oklch(0.12 0.01 265);
+  --linkbeam-ink: oklch(0.97 0.003 265);
+  --linkbeam-surface: oklch(0.2 0.008 265);
+  --linkbeam-surface-2: oklch(0.26 0.008 265);
+  --linkbeam-muted: oklch(0.74 0.01 265);
+  --linkbeam-border: oklch(1 0 0 / 0.12);
+  --linkbeam-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 *,
@@ -231,16 +299,18 @@ button {
 }
 
 .shell,
+.linkbeam-shell,
 .beamlink-shell {
-  width: var(--beamlink-shell-width);
+  width: var(--linkbeam-shell-width);
   margin-inline: auto;
 }
 
 /* Marketing typography utilities */
 [data-surface="marketing"] h1,
+[data-surface="marketing"] .linkbeam-display-lg,
 [data-surface="marketing"] .beamlink-display-lg {
-  font-family: var(--beamlink-font-display);
-  font-size: var(--beamlink-display-lg);
+  font-family: var(--linkbeam-font-display);
+  font-size: var(--linkbeam-display-lg);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.08;
@@ -248,9 +318,10 @@ button {
 }
 
 [data-surface="marketing"] h2,
+[data-surface="marketing"] .linkbeam-display-md,
 [data-surface="marketing"] .beamlink-display-md {
-  font-family: var(--beamlink-font-display);
-  font-size: var(--beamlink-display-md);
+  font-family: var(--linkbeam-font-display);
+  font-size: var(--linkbeam-display-md);
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.12;
@@ -258,20 +329,23 @@ button {
 }
 
 [data-surface="marketing"] h3,
+[data-surface="marketing"] .linkbeam-display-sm,
 [data-surface="marketing"] .beamlink-display-sm {
-  font-family: var(--beamlink-font-display);
-  font-size: var(--beamlink-display-sm);
+  font-family: var(--linkbeam-font-display);
+  font-size: var(--linkbeam-display-sm);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.15;
   text-wrap: balance;
 }
 
+[data-surface="marketing"] .linkbeam-prose,
 [data-surface="marketing"] .beamlink-prose {
-  max-width: var(--beamlink-prose-width);
+  max-width: var(--linkbeam-prose-width);
   text-wrap: pretty;
 }
 
+.linkbeam-marketing,
 .beamlink-marketing {
   display: flex;
   flex-direction: column;

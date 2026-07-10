@@ -11,7 +11,7 @@ const classes = [bodyClass].filter(Boolean).join(" ");
 ---
 
 <BaseLayout {...head} surface="admin" bodyClass={classes}>
-  <div class:list={["beamlink-admin", !fullWidth && "beamlink-admin--shell"]}>
+  <div class:list={["linkbeam-admin", !fullWidth && "linkbeam-admin--shell"]}>
     <slot />
   </div>
 
@@ -43,12 +43,14 @@ const classes = [bodyClass].filter(Boolean).join(" ");
 </BaseLayout>
 
 <style>
-  .beamlink-admin {
+  .linkbeam-admin,
+  :global(.beamlink-admin) {
     min-height: 100dvh;
   }
 
-  .beamlink-admin--shell {
-    width: min(var(--beamlink-max-width), calc(100% - var(--beamlink-space-8)));
+  .linkbeam-admin--shell,
+  :global(.beamlink-admin--shell) {
+    width: min(var(--linkbeam-max-width), calc(100% - var(--linkbeam-space-8)));
     margin-inline: auto;
   }
 </style>
